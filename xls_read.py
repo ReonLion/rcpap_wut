@@ -58,5 +58,5 @@ if __name__ == '__main__':
     print(rx_xls.GPS_rx.shape)
     print(rx_xls.v_rx)
     
-    print(max(tx_xls.v_tx, rx_xls.v_rx))
+    print(tx_xls.v_tx - rx_xls.v_rx)
     
