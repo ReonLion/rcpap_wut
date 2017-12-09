@@ -58,5 +58,8 @@ if __name__ == '__main__':
     print(rx_xls.GPS_rx.shape)
     print(rx_xls.v_rx)
     
+<<<<<<< HEAD
     print(tx_xls.v_tx - rx_xls.v_rx)
+=======
+>>>>>>> 648bed8ab8cbc72b65ccaaea32041f80ee57da36
     
