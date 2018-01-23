@@ -8,12 +8,12 @@ import timeit
 '''
 class txt_read():
     # signal_CIR
-    signal_CIR = []                                                # signal_CIR初始化，其长度是.txt文件数量
+    signal_CIR = []                                                       # signal_CIR初始化，其长度是.txt文件数量
     
     def __init__(self, path):
         # 遍历path目录选取所有.txt文件
         file_list = []
-        for dir_path, dir_names, file_names in os.walk(path):      # 只选取.txt文件
+        for dir_path, dir_names, file_names in os.walk(path):             # 只选取.txt文件
             for file_name in file_names:
                 if os.path.splitext(file_name)[-1] == '.txt':
                     file_list.append(os.path.join(dir_path, file_name))
@@ -32,19 +32,19 @@ class txt_read():
             self.__read(file)
     
     def __read(self, file):
-        with open(file, mode='r') as fp:                           # 打开txt文件，读入所有的行
+        with open(file, mode='r') as fp:                                  # 打开txt文件，读入所有的行
             txt_lines = fp.readlines()
             
         '''
         从第7行开始，每隔4行，采取实部和虚部
         '''
-        real = []                                                  # real和imag一个二维列表，总行数是实部或虚部的行数
+        real = []                                                         # real和imag一个二维列表，总行数是实部或虚部的行数
         imag = []
         for i in range(6, len(txt_lines), 4):
-            txt_lines[i] = txt_lines[i].rstrip('\n')               # 去掉数据行最后的换行符
+            txt_lines[i] = txt_lines[i].rstrip('\n')                      # 去掉数据行最后的换行符
             txt_lines[i + 1] = txt_lines[i + 1].rstrip('\n')
-            real.append(txt_lines[i].split(', '))                  # 实部一行存入列表
-            imag.append(txt_lines[i + 1].split(', '))              # 紧接着的虚部一行存入列表
+            real.append(txt_lines[i].split(', '))                         # 实部一行存入列表
+            imag.append(txt_lines[i + 1].split(', '))                     # 紧接着的虚部一行存入列表
         
         '''
         将每一个对应的实部和虚部相加，存入一个二维数组
@@ -55,11 +55,11 @@ class txt_read():
         re_array = np.array(real, dtype='float')
         im_array = np.array(imag, dtype='float')
         signal_array = re_array + im_array * np.complex('0+1j')
-        signal_array = np.conj(signal_array)                       # 对二维数组每个元素进行共轭
+        signal_array = np.conj(signal_array)                              # 对二维数组每个元素进行共轭
         
         i = 0
         signal_cir = np.zeros_like(signal_array, dtype='complex64')
-        for i in range(signal_array.shape[0]):                           # 对每一行进行傅里叶反变换
+        for i in range(signal_array.shape[0]):                            # 对每一行进行傅里叶反变换
             signal_cir[i] = np.fft.ifft(signal_array[i])
         
         self.signal_CIR.append(signal_cir)
