@@ -6,6 +6,10 @@ from Att_mark import Att_mark
 from GPS_2_distance import GPS_2_distance
 from signal_window import signal_window
 from CIR_window import CIR_window
+from distance_match import distance_match
+from time_match import time_match
+from speed_match import speed_match
+from MakeChirp import MakeChirp
 
 class main_doppler():
     def __init__(self):
@@ -88,9 +92,34 @@ class main_doppler():
         d = GPS_2_distance(GPS_rx, GPS_tx)                                                              # d units: km
         Dis = d * 1000                                                                                  # Dis units: m
         max_v = max_speed                                                                               # 最大相对速度用于取窗
-        win_wide = window * (chirp_num * (c / fc)) // max_v                                             # 窗宽 units: chirp
+        win_wide = np.floor(window * (chirp_num * (c / fc)) / max_v)                                    # 窗宽 units: chirp
         after_window = signal_window(win_wide, data_pdp)
         after_window_cir = CIR_window(win_wide, CIR_1)
+        distance = distance_match(after_window, Dis)
+        time = time_match(after_window, T)
+        V_rel = speed_match(after_window, rel_speed)
+        num_a = np.shape(distance)[0]
+        pdp_window = after_window[0]
+        D_window = distance[0]
+        TIME = time[0]
+        V_Rel = V_rel[0]
+        for i in range(0, num_a - 1):
+            pdp_window = np.row_stack((pdp_window, after_window[i + 1]))
+            D_window = np.concatenate((D_window, distance[i + 1]), axis = 0)
+            TIME = np.concatenate((TIME, time[i + 1]), axis = 0)
+            V_Rel = np.concatenate((V_Rel, V_rel[i + 1]), axis = 0)
+        CIR_window_doppler = after_window_cir[0 : np.shape(TIME)[0]]
+        after_window_cir = []
+        CIR_1 = []
+        
+        '''
+        获取振幅分布数据
+        '''
+        AIC_data = CIR_window_doppler[:]
+        NA = len(AIC_data)                                                                              # 按照分段获取数组范围( 20*lambda )
+        Chirp_t = MakeChirp(SampFreqDec = 1 / 8.125e-9, ChirpBandw = 100e6, NchirpDec = np.shape(AIC_data[0])[-1])           # 产生模拟标准chirp信号
+        Chirp_f = np.fft.fftshift(np.fft.fft(np.conj(np.flipud(Chirp_t))))                              # 为除去卷积chirp信号做准备
+        
         
         '''
         debug message
@@ -130,6 +159,42 @@ class main_doppler():
         for after_window_cir_i in after_window_cir:
             print(after_window_cir_i.shape)
             print(after_window_cir_i[0][0:6])
+        print('distance')
+        for distance_i in distance:
+            print(distance_i.shape)
+            print(distance_i[0:6])
+        print('time')
+        for time_i in time:
+            print(time_i.shape)
+            print(time_i[0:6])
+        print('V_rel')
+        for V_rel_i in V_rel:
+            print(V_rel_i.shape)
+            print(V_rel_i[0:6])
+        print('pdp_window')
+        print(pdp_window.shape)
+        print(pdp_window[-1][0:6])
+        print('D_window')
+        print(D_window.shape)
+        print(D_window[20:26])
+        print('TIME')
+        print(TIME.shape)
+        print(TIME[20:26])
+        print('V_Rel')
+        print(V_Rel.shape)
+        print(V_Rel[20:26])
+        print('CIR_window_doppler')
+        print(len(CIR_window_doppler))
+        for CIR_window_doppler_i in CIR_window_doppler:
+            print(CIR_window_doppler_i.shape)
+            print(CIR_window_doppler_i[0][0:6])
+        print('Chirp_t')
+        print(Chirp_t.shape)
+        print(Chirp_t[0:6])
+        print('Chirp_f')
+        print(Chirp_f.shape)
+        print(Chirp_f[0:6])
+        
 
 if __name__ == '__main__':
     main_doppler()

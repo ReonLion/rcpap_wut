@@ -32,8 +32,10 @@ class txt_read():
             self.__read(file)
     
     def __read(self, file):
+        txt_lines = []
         with open(file, mode='r') as fp:                                  # 打开txt文件，读入所有的行
             txt_lines = fp.readlines()
+
             
         '''
         从第7行开始，每隔4行，采取实部和虚部
