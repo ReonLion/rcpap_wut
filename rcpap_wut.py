@@ -1,5 +1,7 @@
 # coding=utf-8
 import numpy as np
+import timeit
+
 from txt_read import txt_read
 from xls_read import tx_xls_read, rx_xls_read
 from Att_mark import Att_mark
@@ -197,4 +199,12 @@ class main_doppler():
         
 
 if __name__ == '__main__':
+    begin_time = timeit.default_timer()
+    
+    '''
+    主程序
+    '''
     main_doppler()
+    
+    end_time = timeit.default_timer()
+    print(str(end_time - begin_time))    
