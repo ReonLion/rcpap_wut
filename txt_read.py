@@ -62,7 +62,7 @@ class txt_read():
         i = 0
         signal_cir = np.zeros_like(signal_array, dtype='complex64')
         for i in range(signal_array.shape[0]):                            # 对每一行进行傅里叶反变换
-            signal_cir[i] = np.fft.ifft(signal_array[i])
+            signal_cir[i] = np.fft.ifft(signal_array[i], axis = 0)
         
         self.signal_CIR.append(signal_cir)
     

@@ -12,9 +12,15 @@ from distance_match import distance_match
 from time_match import time_match
 from speed_match import speed_match
 from MakeChirp import MakeChirp
+from small_scale_match import small_scale_match
 
 class main_doppler():
     def __init__(self):
+        '''
+        设置Debug模式
+        '''
+        debug_mode = True
+        
         '''
         设置t_start和t_stop
         '''
@@ -120,82 +126,165 @@ class main_doppler():
         AIC_data = CIR_window_doppler[:]
         NA = len(AIC_data)                                                                              # 按照分段获取数组范围( 20*lambda )
         Chirp_t = MakeChirp(SampFreqDec = 1 / 8.125e-9, ChirpBandw = 100e6, NchirpDec = np.shape(AIC_data[0])[-1])           # 产生模拟标准chirp信号
-        Chirp_f = np.fft.fftshift(np.fft.fft(np.conj(np.flipud(Chirp_t))))                              # 为除去卷积chirp信号做准备
+        Chirp_f = np.fft.fftshift(np.fft.fft(np.conj(np.flipud(Chirp_t)), axis = 0))                    # 为除去卷积chirp信号做准备
+        AIC_com = []
+        AIC_DATA = []
+
+        for pot in range(0, NA):                                                                        # 循环获取每个分段内的AIC标准数据
+            AIC_data_t = []
+            aic_data = AIC_data[pot].T
+            data_f = np.fft.fft(aic_data, axis = 0)
+            nb = np.shape(data_f)[1]
+            for n in range(0, nb):                                                                      # 循环堆积每段内的标准数据
+                Data_f = np.concatenate((np.zeros(279), data_f[279:2281, n], np.zeros(2560 - 2281)), axis = 0)
+                AIC_data_f = Data_f / Chirp_f
+                AIC_data_t = np.concatenate((AIC_data_t, np.fft.ifft(AIC_data_f, axis = 0)))
+            AIC_com.append(AIC_data_t)
+            AIC_DATA.append(np.abs(AIC_data_t))
+        
+        '''
+        等效窄带信号获取处理
+        '''
+        distance_sm = small_scale_match(CIR_window_doppler, D_window)
+        time_sm = small_scale_match(CIR_window_doppler, TIME)
+        num_sm1 = np.shape(CIR_window_doppler)[0]
+        SM_time = []
+        SM_distance = []
+        PL_no_sm = []
+        L = 0
+        C = 0
+        for num in range(0, num_sm1 - 1):
+            L = np.shape(CIR_window_doppler[num])[0]
+            C = np.shape(CIR_window_doppler[num])[1]
+            ave_sm = ATT * np.power(np.abs(CIR_window_doppler[num]), 2)
+            Ave_sm = np.sum(np.sum(ave_sm, axis = 1) / C, axis = 0) / L
+            PL_no_sm = np.concatenate((PL_no_sm, np.linspace(Ave_sm, Ave_sm, L)))
+            SM_time = np.concatenate((SM_time, time_sm[num]))
+            SM_distance = np.concatenate((SM_distance, distance_sm[num]))
+            
+        Equ_Narr_band = CIR_window_doppler[0]
+        for num in range(1, num_sm1 - 1):
+            Equ_Narr_band = np.concatenate((Equ_Narr_band, CIR_window_doppler[num]), axis = 0)
+            
+        Narrow_band_signal = ATT * np.abs(np.power(Equ_Narr_band[0:np.shape(SM_time)[0], :], 2))
+        NB_signal = 10 * np.log10(np.sum(Narrow_band_signal, axis = 1) / C)
+        PL_no_SM = 10 * np.log10(PL_no_sm)
+        Small_scale_fading = NB_signal - PL_no_SM
+        TIME = TIME + beg_t_mark
+        Equ_Narr_band = []
+        Narrow_band_signal = []
+        
+        '''
+        多普勒频移处理
+        '''
+        
         
         
         '''
         debug message
         '''
-        print('GPS_rx')
-        print(GPS_rx)
-        print('GPS_tx')
-        print(GPS_tx)
-        print('v_rx')
-        print(v_rx)
-        print('v_tx')
-        print(v_tx)
-        print('rel_speed')
-        print(rel_speed)
-        print('ATT')
-        print(ATT)
-        print('data_pdp')
-        for data in data_pdp:
-            print(data.shape)
-            print(data[0][0:6])
-        print('CIR_1')
-        for data in CIR_1:
-            print(data.shape)
-            print(data[0][0:6])
-        print('T')
-        print(T)
-        print('d')
-        print(d)
-        print('win_wide')
-        print(win_wide)
-        print('after_window')
-        for after_window_i in after_window:
-            print(after_window_i.shape)
-            print(after_window_i[0][0:6])
-        print('after_window_cir')
-        print(len(after_window_cir))
-        for after_window_cir_i in after_window_cir:
-            print(after_window_cir_i.shape)
-            print(after_window_cir_i[0][0:6])
-        print('distance')
-        for distance_i in distance:
-            print(distance_i.shape)
-            print(distance_i[0:6])
-        print('time')
-        for time_i in time:
-            print(time_i.shape)
-            print(time_i[0:6])
-        print('V_rel')
-        for V_rel_i in V_rel:
-            print(V_rel_i.shape)
-            print(V_rel_i[0:6])
-        print('pdp_window')
-        print(pdp_window.shape)
-        print(pdp_window[-1][0:6])
-        print('D_window')
-        print(D_window.shape)
-        print(D_window[20:26])
-        print('TIME')
-        print(TIME.shape)
-        print(TIME[20:26])
-        print('V_Rel')
-        print(V_Rel.shape)
-        print(V_Rel[20:26])
-        print('CIR_window_doppler')
-        print(len(CIR_window_doppler))
-        for CIR_window_doppler_i in CIR_window_doppler:
-            print(CIR_window_doppler_i.shape)
-            print(CIR_window_doppler_i[0][0:6])
-        print('Chirp_t')
-        print(Chirp_t.shape)
-        print(Chirp_t[0:6])
-        print('Chirp_f')
-        print(Chirp_f.shape)
-        print(Chirp_f[0:6])
+        if debug_mode:
+            print('GPS_rx')
+            print(GPS_rx)
+            print('GPS_tx')
+            print(GPS_tx)
+            print('v_rx')
+            print(v_rx)
+            print('v_tx')
+            print(v_tx)
+            print('rel_speed')
+            print(rel_speed)
+            print('ATT')
+            print(ATT)
+            print('data_pdp')
+            for data in data_pdp:
+                print(data.shape)
+                print(data[0][0:6])
+            print('CIR_1')
+            for data in CIR_1:
+                print(data.shape)
+                print(data[0][0:6])
+            print('T')
+            print(T)
+            print('d')
+            print(d)
+            print('win_wide')
+            print(win_wide)
+            print('after_window')
+            for after_window_i in after_window:
+                print(after_window_i.shape)
+                print(after_window_i[0][0:6])
+            print('after_window_cir')
+            print(len(after_window_cir))
+            for after_window_cir_i in after_window_cir:
+                print(after_window_cir_i.shape)
+                print(after_window_cir_i[0][0:6])
+            print('distance')
+            for distance_i in distance:
+                print(distance_i.shape)
+                print(distance_i[0:6])
+            print('time')
+            for time_i in time:
+                print(time_i.shape)
+                print(time_i[0:6])
+            print('V_rel')
+            for V_rel_i in V_rel:
+                print(V_rel_i.shape)
+                print(V_rel_i[0:6])
+            print('pdp_window')
+            print(pdp_window.shape)
+            print(pdp_window[-1][0:6])
+            print('D_window')
+            print(D_window.shape)
+            print(D_window[20:26])
+            print('TIME')
+            print(TIME.shape)
+            print(TIME[20:26])
+            print('V_Rel')
+            print(V_Rel.shape)
+            print(V_Rel[20:26])
+            print('CIR_window_doppler')
+            print(len(CIR_window_doppler))
+            for CIR_window_doppler_i in CIR_window_doppler:
+                print(CIR_window_doppler_i.shape)
+                print(CIR_window_doppler_i[0][0:6])
+            print('Chirp_t')
+            print(Chirp_t.shape)
+            print(Chirp_t[0:6])
+            print('Chirp_f')
+            print(Chirp_f.shape)
+            print(Chirp_f[0:6])
+            print('AIC_com')
+            print(len(AIC_com))
+            print(AIC_com[0][0:6])
+            print(AIC_com[-1][0:6])
+            print('AIC_DATA')
+            print(len(AIC_DATA))
+            print(AIC_DATA[0][0:6])
+            print(AIC_DATA[-1][0:6])
+            print('distance_sm')
+            print(len(distance_sm))
+            print(distance_sm[0][0:6])
+            print(distance_sm[-1][0:6])
+            print('time_sm')
+            print(len(time_sm))
+            print(time_sm[0][0:6])
+            print(time_sm[-1][0:6])
+            print('PL_no_sm')
+            print(PL_no_sm.shape)
+            print(PL_no_sm[0:6])
+            print('SM_time')
+            print(SM_time.shape)
+            print(SM_time[0:6])
+            print(SM_time[-6:])
+            print('SM_distance')
+            print(SM_distance.shape)
+            print(SM_distance[0:6])
+            print(SM_distance[-6:])
+            print('Small_scale_fading')
+            print(Small_scale_fading.shape)
+            print(Small_scale_fading[0:6])
+            print(Small_scale_fading[-6:])
         
 
 if __name__ == '__main__':
@@ -207,4 +296,5 @@ if __name__ == '__main__':
     main_doppler()
     
     end_time = timeit.default_timer()
-    print(str(end_time - begin_time))    
+    print('Running time')
+    print(str(end_time - begin_time))
