@@ -1,5 +1,8 @@
 # coding=utf-8
 import numpy as np
+from matplotlib import pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
 import timeit
 
 from txt_read import txt_read
@@ -145,15 +148,15 @@ class main_doppler():
         '''
         等效窄带信号获取处理
         '''
-        distance_sm = small_scale_match(CIR_window_doppler, D_window)
-        time_sm = small_scale_match(CIR_window_doppler, TIME)
+        distance_sm = small_scale_match(CIR_window_doppler, D_window)                                   # 与小尺度匹配的距离信息 注意因为差分的缘故比正常少一个cell
+        time_sm = small_scale_match(CIR_window_doppler, TIME)                                           # 与小尺度匹配的时间信息 注意因为差分的缘故比正常少一个cell
         num_sm1 = np.shape(CIR_window_doppler)[0]
         SM_time = []
         SM_distance = []
         PL_no_sm = []
         L = 0
         C = 0
-        for num in range(0, num_sm1 - 1):
+        for num in range(0, num_sm1 - 1):                                                               # 注意因为差分的缘故比正常少一个cell 因此此处num_sm1 - 1
             L = np.shape(CIR_window_doppler[num])[0]
             C = np.shape(CIR_window_doppler[num])[1]
             ave_sm = ATT * np.power(np.abs(CIR_window_doppler[num]), 2)
@@ -170,15 +173,104 @@ class main_doppler():
         NB_signal = 10 * np.log10(np.sum(Narrow_band_signal, axis = 1) / C)
         PL_no_SM = 10 * np.log10(PL_no_sm)
         Small_scale_fading = NB_signal - PL_no_SM
-        TIME = TIME + beg_t_mark
+        TIME = TIME + beg_t_mark                                                                        # 平移时间
         Equ_Narr_band = []
         Narrow_band_signal = []
         
         '''
         多普勒频移处理
         '''
+        num_aa = len(CIR_window_doppler)
+        fre_resolution = np.floor(chirp_num) / win_wide
+        Hz_x = np.flipud(np.arange(-np.floor(chirp_num / 2), np.floor(chirp_num / 2) + 1, fre_resolution))  # 以窗为单位的多普勒频移再翻转
+        fre_domain = []
+        for_dop = []
+        fre_nor_domain = []
+        idx = []
+        p_Hz = []
+        p_De = []
+        for n in range(0, num_aa):
+            # 未归一化数据 注意这里fftshift至关重要
+            fre_domain.append(10 * np.log10(ATT * np.power(np.abs(np.fft.fftshift(np.fft.fft(CIR_window_doppler[n], axis=0), axes=(0, ))), 2)))
+            for_dop.append(np.power(np.abs(np.fft.fftshift(np.fft.fft(CIR_window_doppler[n], axis=0), axes=(0, ))), 2))
+            fre_nor_domain.append(fre_domain[n] - np.max(np.max(fre_domain[n])))                        # 归一化因为是dB形式故而相减
+            idx = np.where(fre_nor_domain[n] == np.max(np.max(fre_nor_domain[n])))
+            p_Hz.append(idx[0][0])
+            p_De.append(idx[1][0])
+        p_Hz = np.array(p_Hz)
+        p_De = np.array(p_De)
         
+        Max_doppler = []
+        for n in range(0, num_aa):
+            Max_doppler.append(Hz_x[p_Hz[n]])                                                           # 最大多普勒频移记录 units: Hz
+        Max_doppler = np.array(Max_doppler)
         
+        '''
+        瞬时多普勒频移制图需要
+        '''
+        idx = np.where(TIME == T_doppler + T[0])
+        d_begp = np.max(idx[0])                                                                         # 确认起始点
+        d_endp = d_begp + num_file                                                                      # 确认终止点 以 0.5 s 为单位的多普勒频移 取一半的文件 
+        CIR_D = CIR_window_doppler[d_begp : d_endp + 1]
+        num_Da = len(CIR_D)
+        
+        CIR_doppler = CIR_D[0]
+        for n in range(1, num_Da):
+            CIR_doppler = np.concatenate((CIR_doppler, CIR_D[n]))
+            
+        # 具体秒数多普勒频移
+        fre_in_domain = 10 * np.log10(ATT * np.power(np.abs(np.fft.fftshift(np.fft.fft(CIR_doppler, axis=0), axes=(0, ))), 2))
+        Fre_innor_domain = fre_in_domain - np.max(np.max(fre_in_domain))                                # 归一化操作
+        Fre_resolution = np.floor(chirp_num) / (win_wide * np.arange(d_begp, d_endp + 1).shape[0])
+        # 瞬时多普勒频移再翻转
+        Hz_in_x = np.flipud(np.arange(-np.floor(chirp_num / 2), np.floor(chirp_num / 2) + 1, Fre_resolution))
+        RSL = 10 * np.log10(np.sum(pdp_window, axis = 1) / np.shape(pdp_window)[-1])                    # RSL units: dBm
+        channel_gain = RSL + cable1 + cable2 - TX_power - TX_Gain - RX_Gain
+        
+        AAA = len(fre_nor_domain)
+        num_AA = []
+        num_BB = []
+        for nn in range(0, AAA):
+            idx = np.where(fre_nor_domain[nn] == np.max(np.max(fre_nor_domain[nn])))
+            num_AA.append(idx[0][0])
+            num_BB.append(idx[1][0])
+        num_AA = np.array(num_AA)
+        num_BB = np.array(num_BB)
+        
+        LOS_doppler = Hz_x[num_AA]
+        LOS_delay = (num_BB + 1) * t_res
+        
+        '''
+        图形生成程序
+        '''
+        TIME = TIME - 70
+        
+        #self.fig = plt.figure(figsize=(8, 6), dpi=100, tight_layout=True)
+        # 自动控制排版
+        self.fig = plt.figure(tight_layout = True)
+        
+        self.ax = self.fig.add_subplot(211)
+        X, Y = np.meshgrid(TIME, np.arange(t_res, t_res * 2560 + 1, t_res))
+        self.ax.contourf(X, Y, 10 * np.log10(pdp_window.T), zdir = 'z', cmap = cm.coolwarm)
+        self.ax.set_xlim(np.min(TIME), np.max(TIME))
+        self.ax.set_ylim(0, t_res * 400)
+        #self.ax.set_xticks(np.linspace(np.min(TIME), np.max(TIME), 11, endpoint = True))
+        #self.ax.set_yticks(np.linspace(0, t_res * 400, 5, endpoint = True))
+        self.ax.set_xlabel('Time in s', fontproperties = 'Times New Roman', fontsize = 10)
+        self.ax.set_ylabel('Delay in ns', fontproperties = 'Times New Roman', fontsize = 10)
+        
+        self.ax = self.fig.add_subplot(212)
+        self.ax.plot(TIME, channel_gain, linewidth = 2.0)
+        self.ax.set_xlim(np.min(TIME), np.max(TIME))
+        self.ax.set_ylim(np.min(channel_gain), np.max(channel_gain))
+        #self.ax.set_xticks(np.linspace(np.min(TIME), np.max(TIME), 11, endpoint = True))
+        #self.ax.set_yticks(np.linspace(np.min(channel_gain), np.max(channel_gain), 5, endpoint = True))
+        self.ax.set_xlabel('Time in s', fontproperties = 'Times New Roman', fontsize = 10)
+        self.ax.set_ylabel('Channel gain in dB', fontproperties = 'Times New Roman', fontsize = 10)
+        # 显示网格
+        self.ax.grid(True)
+        
+        plt.show()
         
         '''
         debug message
@@ -285,6 +377,66 @@ class main_doppler():
             print(Small_scale_fading.shape)
             print(Small_scale_fading[0:6])
             print(Small_scale_fading[-6:])
+            print('fre_domain')
+            print(len(fre_domain))
+            print(fre_domain[0].shape)
+            print(fre_domain[0][0, 0:6])
+            print(fre_domain[-1][0, 0:6])
+            print('for_dop')
+            print(len(for_dop))
+            print(for_dop[0].shape)
+            print(for_dop[0][0, 0:6])
+            print(for_dop[-1][0, 0:6])
+            print('fre_nor_domain')
+            print(len(fre_nor_domain))
+            print(fre_nor_domain[0].shape)
+            print(fre_nor_domain[0][0, 0:6])
+            print(fre_nor_domain[-1][0, 0:6])
+            print('p_Hz')
+            print(p_Hz.shape)
+            print(p_Hz)
+            print('p_De')
+            print(p_De.shape)
+            print(p_De)
+            print('Max_doppler')
+            print(Max_doppler.shape)
+            print(Max_doppler)
+            print('CIR_D')
+            print(len(CIR_D))
+            print(CIR_D[0][0, 0:6])
+            print(CIR_D[-1][0, 0:6])
+            print('CIR_doppler')
+            print(CIR_doppler.shape)
+            print(CIR_doppler[0, 0:6])
+            print(CIR_doppler[-1, 0:6])
+            print('Fre_innor_domain')
+            print(Fre_innor_domain.shape)
+            print(Fre_innor_domain[0, 0:6])
+            print(Fre_innor_domain[-1, 0:6])
+            print('Fre_resolution')
+            print(Fre_resolution)
+            print('Hz_in_x')
+            print(Hz_in_x.shape)
+            print(Hz_in_x[0:6])
+            print(Hz_in_x[-6:])
+            print('channel_gain')
+            print(channel_gain.shape)
+            print(channel_gain[0:6])
+            print(channel_gain[-6:])
+            print('num_AA')
+            print(num_AA.shape)
+            print(num_AA)
+            print('num_BB')
+            print(num_BB.shape)
+            print(num_BB)
+            print('LOS_doppler')
+            print(LOS_doppler.shape)
+            print(LOS_doppler[0:6])
+            print(LOS_doppler[-6:])
+            print('LOS_delay')
+            print(LOS_delay.shape)
+            print(LOS_delay[0:6])
+            print(LOS_delay[-6:])
         
 
 if __name__ == '__main__':
