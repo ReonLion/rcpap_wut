@@ -182,7 +182,7 @@ class main_doppler():
         '''
         num_aa = len(CIR_window_doppler)
         fre_resolution = np.floor(chirp_num) / win_wide
-        Hz_x = np.flipud(np.arange(-np.floor(chirp_num / 2), np.floor(chirp_num / 2) + 1, fre_resolution))  # 以窗为单位的多普勒频移再翻转
+        Hz_x = np.flipud(np.arange(-np.floor(chirp_num / 2), np.floor(chirp_num / 2) + fre_resolution / 10e4, fre_resolution))  # 以窗为单位的多普勒频移再翻转
         fre_domain = []
         for_dop = []
         fre_nor_domain = []
@@ -221,9 +221,9 @@ class main_doppler():
         # 具体秒数多普勒频移
         fre_in_domain = 10 * np.log10(ATT * np.power(np.abs(np.fft.fftshift(np.fft.fft(CIR_doppler, axis=0), axes=(0, ))), 2))
         Fre_innor_domain = fre_in_domain - np.max(np.max(fre_in_domain))                                # 归一化操作
-        Fre_resolution = np.floor(chirp_num) / (win_wide * np.arange(d_begp, d_endp + 1).shape[0])
+        Fre_resolution = np.floor(chirp_num) / (win_wide * np.arange(d_begp, d_endp + 0.1).shape[0])
         # 瞬时多普勒频移再翻转
-        Hz_in_x = np.flipud(np.arange(-np.floor(chirp_num / 2), np.floor(chirp_num / 2) + 1, Fre_resolution))
+        Hz_in_x = np.flipud(np.arange(-np.floor(chirp_num / 2), np.floor(chirp_num / 2) + Fre_resolution / 10e4, Fre_resolution))
         RSL = 10 * np.log10(np.sum(pdp_window, axis = 1) / np.shape(pdp_window)[-1])                    # RSL units: dBm
         channel_gain = RSL + cable1 + cable2 - TX_power - TX_Gain - RX_Gain
         
@@ -245,32 +245,200 @@ class main_doppler():
         '''
         TIME = TIME - 70
         
-        #self.fig = plt.figure(figsize=(8, 6), dpi=100, tight_layout=True)
+        '''
+        绘制保存fig1
+        '''
+        #fig = plt.figure(figsize=(8, 6), dpi=100, tight_layout=True)
         # 自动控制排版
-        self.fig = plt.figure(tight_layout = True)
+        fig = plt.figure(tight_layout = True)
         
-        self.ax = self.fig.add_subplot(211)
-        X, Y = np.meshgrid(TIME, np.arange(t_res, t_res * 2560 + 1, t_res))
-        self.ax.contourf(X, Y, 10 * np.log10(pdp_window.T), zdir = 'z', cmap = cm.coolwarm)
-        self.ax.set_xlim(np.min(TIME), np.max(TIME))
-        self.ax.set_ylim(0, t_res * 400)
-        #self.ax.set_xticks(np.linspace(np.min(TIME), np.max(TIME), 11, endpoint = True))
-        #self.ax.set_yticks(np.linspace(0, t_res * 400, 5, endpoint = True))
-        self.ax.set_xlabel('Time in s', fontproperties = 'Times New Roman', fontsize = 10)
-        self.ax.set_ylabel('Delay in ns', fontproperties = 'Times New Roman', fontsize = 10)
+        ax = fig.add_subplot(211)
+        X, Y = np.meshgrid(TIME, np.arange(t_res, t_res * 2560 + t_res / 10e4, t_res))
+        Z = 10 * np.log10(pdp_window.T)
         
-        self.ax = self.fig.add_subplot(212)
-        self.ax.plot(TIME, channel_gain, linewidth = 2.0)
-        self.ax.set_xlim(np.min(TIME), np.max(TIME))
-        self.ax.set_ylim(np.min(channel_gain), np.max(channel_gain))
-        #self.ax.set_xticks(np.linspace(np.min(TIME), np.max(TIME), 11, endpoint = True))
-        #self.ax.set_yticks(np.linspace(np.min(channel_gain), np.max(channel_gain), 5, endpoint = True))
-        self.ax.set_xlabel('Time in s', fontproperties = 'Times New Roman', fontsize = 10)
-        self.ax.set_ylabel('Channel gain in dB', fontproperties = 'Times New Roman', fontsize = 10)
+        ax.contourf(X, Y, Z, cmap = cm.jet)
+        ax.set_xlim(np.min(TIME), np.max(TIME))
+        ax.set_ylim(0, t_res * 400)
+        #ax.set_xticks(np.linspace(np.min(TIME), np.max(TIME), 11, endpoint = True))
+        #ax.set_yticks(np.linspace(0, t_res * 400, 5, endpoint = True))
+        ax.set_xlabel('Time in s', fontproperties = 'Times New Roman', fontsize = 10)
+        ax.set_ylabel('Delay in ns', fontproperties = 'Times New Roman', fontsize = 10)
+        
+        ax = fig.add_subplot(212)
+        ax.plot(TIME, channel_gain, 'b',linewidth = 2.0)
+        ax.set_xlim(np.min(TIME), np.max(TIME))
+        ax.set_ylim(np.min(channel_gain), np.max(channel_gain))
+        #ax.set_xticks(np.linspace(np.min(TIME), np.max(TIME), 11, endpoint = True))
+        #ax.set_yticks(np.linspace(np.min(channel_gain), np.max(channel_gain), 5, endpoint = True))
+        ax.set_xlabel('Time in s', fontproperties = 'Times New Roman', fontsize = 10)
+        ax.set_ylabel('Channel gain in dB', fontproperties = 'Times New Roman', fontsize = 10)
         # 显示网格
-        self.ax.grid(True)
+        ax.grid(True)
         
-        plt.show()
+        plt.savefig('./results/Main_function_and_doppler/Main_function_and_doppler_fig1')
+        
+        '''
+        绘制保存fig11
+        绘制3d图像, rstride=1, cstride=1相当耗时
+        '''
+        fig = plt.figure(tight_layout = True)
+        ax = fig.add_subplot(111, projection = '3d')
+        ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.jet, linewidth=0, antialiased=False)
+        ax.view_init(None, 30)
+        ax.set_xlabel('Time in s', fontproperties = 'Times New Roman', fontsize = 10)
+        ax.set_zlabel('Delay in ns', fontproperties = 'Times New Roman', fontsize = 10)
+        
+        plt.savefig('./results/Main_function_and_doppler/Main_function_and_doppler_fig11')
+        
+        '''
+        绘制保存fig2
+        '''
+        sec = 5
+        num_win = 2
+        
+        X = np.arange(t_res, t_res * 2560 + t_res / 10e4, t_res)
+        Y = 10 * np.log10(after_window[sec - 1][num_win - 1, :])
+        
+        fig = plt.figure(tight_layout = True)
+        ax = fig.add_subplot(111)
+        ax.plot(X, Y, 'b', linewidth = 2)
+        ax.set_xlim(0, t_res * 2560)
+        ax.set_ylim(np.min(Y), np.max(Y))
+        ax.set_xlabel('Time in ns', fontproperties = 'Times New Roman', fontsize = 10)
+        ax.set_ylabel('Average PDP in dB', fontproperties = 'Times New Roman', fontsize = 10)
+        ax.grid(True)
+        
+        plt.savefig('./results/Main_function_and_doppler/Main_function_and_doppler_fig2')
+        
+        '''
+        绘制保存fig3
+        '''
+        n = 35
+        
+        X = np.arange(t_res / 1000, t_res * 2560 / 1000 + t_res / 1000 / 10e4, t_res / 1000)
+        Y = Hz_x
+        X, Y = np.meshgrid(X, Y)
+        Z = fre_nor_domain[n - 1]
+        
+        fig = plt.figure(tight_layout = True)
+        ax = fig.add_subplot(111)
+        ax.contourf(X, Y, Z, cmap = cm.jet)
+        ax.set_xlim(0, 5)
+        ax.set_ylim(-966, 966)
+        ax.set_xlabel('Time in us', fontproperties = 'Times New Roman', fontsize = 10)
+        ax.set_ylabel('Doppler Frequency in Hz', fontproperties = 'Times New Roman', fontsize = 10)
+        
+        plt.savefig('./results/Main_function_and_doppler/Main_function_and_doppler_fig3')
+        
+        '''
+        绘制保存fig4
+        '''
+        X = np.arange(t_res, t_res * 2560 + t_res / 10e4, t_res)
+        Y = Hz_in_x
+        X, Y = np.meshgrid(X, Y)
+        Z = Fre_innor_domain[0 : np.shape(Hz_in_x)[0], :]
+    
+        fig = plt.figure(tight_layout = True)
+        ax = fig.add_subplot(111)
+        ax.contourf(X, Y, Z, cmap = cm.jet)
+        ax.set_xlim(0, 2000)
+        ax.set_ylim(-966, 966)
+        ax.set_xlabel('Delay in us', fontproperties = 'Times New Roman', fontsize = 10)
+        ax.set_ylabel('Doppler Frequency in Hz', fontproperties = 'Times New Roman', fontsize = 10)
+    
+        plt.savefig('./results/Main_function_and_doppler/Main_function_and_doppler_fig4')
+        
+        '''
+        绘制保存fig5
+        '''
+        X = SM_time
+        Y = NB_signal
+    
+        fig = plt.figure(tight_layout = True)
+        ax = fig.add_subplot(111)
+        ax.plot(SM_time, NB_signal, 'b-')
+        ax.plot(SM_time, PL_no_SM, 'r-')
+        ax.set_xlabel('time in seconds', fontproperties = 'Times New Roman', fontsize = 10)
+        ax.set_ylabel('RSL in dBm', fontproperties = 'Times New Roman', fontsize = 10)
+        ax.grid(True)
+    
+        plt.savefig('./results/Main_function_and_doppler/Main_function_and_doppler_fig5')
+        
+        '''
+        绘制保存fig6
+        '''
+        X = SM_time
+        Y = Small_scale_fading
+    
+        fig = plt.figure(tight_layout = True)
+        ax = fig.add_subplot(111)
+        ax.plot(X, Y, 'b')
+        ax.set_xlim(np.min(X), np.max(X))
+        ax.set_ylim(np.min(Y), np.max(Y))
+        ax.set_xlabel('time in seconds', fontproperties = 'Times New Roman', fontsize = 10)
+        ax.set_ylabel('Small_scale_fading in dB', fontproperties = 'Times New Roman', fontsize = 10)
+        ax.grid(True)
+    
+        plt.savefig('./results/Main_function_and_doppler/Main_function_and_doppler_fig6')
+        
+        '''
+        绘制保存fig8
+        '''
+        X = TIME
+        Y = channel_gain
+    
+        fig = plt.figure(tight_layout = True)
+        ax = fig.add_subplot(111)
+        ax.plot(X, Y, 'b')
+        ax.set_xlim(np.min(X), np.max(X))
+        ax.set_ylim(np.min(Y), np.max(Y))
+        ax.set_xlabel('Time in s', fontproperties = 'Times New Roman', fontsize = 10)
+        ax.set_ylabel('Channel gain in dB', fontproperties = 'Times New Roman', fontsize = 10)
+        ax.grid(True)
+    
+        plt.savefig('./results/Main_function_and_doppler/Main_function_and_doppler_fig8')
+        
+        '''
+        保存变量
+        '''
+        np.savez('./params/delay_paras.npz', fc = fc, c = c, ATT = ATT, chirp_num = chirp_num, window = window, 
+                 beg_p = beg_p, end_p = end_p, beg_t_mark = beg_t_mark, cable1 = cable1, cable2 = cable2, 
+                 TX_power = TX_power, TX_Gain = TX_Gain, RX_Gain = RX_Gain, TX_heigh = TX_heigh, RX_heigh = RX_heigh,
+                 TIME = TIME, D_window = D_window, v_rx = v_rx, v_tx = v_tx)
+        np.savez('./params/delay_data.npz', after_window = after_window)
+        np.savez('./params/ssf_paras.npz', fc = fc, c = c, ATT = ATT, chirp_num = chirp_num, window = window, 
+                 beg_p = beg_p, end_p = end_p, beg_t_mark = beg_t_mark, cable1 = cable1, cable2 = cable2, 
+                 TX_power = TX_power, TX_Gain = TX_Gain, RX_Gain = RX_Gain, TX_heigh = TX_heigh, RX_heigh = RX_heigh,
+                 TIME = TIME, D_window = D_window, v_rx = v_rx, v_tx = v_tx, win_wide = win_wide)
+        np.savez('./params/ssf_data.npz', NB_signal = NB_signal, PL_no_SM = PL_no_SM, Small_scale_fading = Small_scale_fading)
+        np.savez('./params/Amp_DATA.npz', AIC_DATA = AIC_DATA)
+        np.savez('./params/PL_paras.npz', fc = fc, c = c, ATT = ATT, chirp_num = chirp_num, window = window, 
+                 beg_p = beg_p, end_p = end_p, beg_t_mark = beg_t_mark, cable1 = cable1, cable2 = cable2, 
+                 TX_power = TX_power, TX_Gain = TX_Gain, RX_Gain = RX_Gain, TX_heigh = TX_heigh, RX_heigh = RX_heigh,
+                 TIME = TIME, D_window = D_window, v_rx = v_rx, v_tx = v_tx)
+        np.savez('./params/PL_data.npz', RSL = RSL)
+        np.savez('./params/PDP_paras.npz', fc = fc, c = c, ATT = ATT, chirp_num = chirp_num, window = window, 
+                 beg_p = beg_p, end_p = end_p, beg_t_mark = beg_t_mark, cable1 = cable1, cable2 = cable2, 
+                 TX_power = TX_power, TX_Gain = TX_Gain, RX_Gain = RX_Gain, TX_heigh = TX_heigh, RX_heigh = RX_heigh,
+                 TIME = TIME, D_window = D_window, v_rx = v_rx, v_tx = v_tx)
+        np.savez('./params/PDP_data.npz', pdp_window = pdp_window)
+        np.savez('./params/fre_paras.npz', fc = fc, c = c, ATT = ATT, chirp_num = chirp_num, window = window, 
+                 beg_p = beg_p, end_p = end_p, beg_t_mark = beg_t_mark, cable1 = cable1, cable2 = cable2, 
+                 TX_power = TX_power, TX_Gain = TX_Gain, RX_Gain = RX_Gain, TX_heigh = TX_heigh, RX_heigh = RX_heigh,
+                 TIME = TIME, D_window = D_window, v_rx = v_rx, v_tx = v_tx)
+        np.savez('./params/fre_data.npz', LOS_doppler = LOS_doppler, LOS_delay = LOS_delay)
+        np.savez('./params/channelgain_paras.npz', fc = fc, c = c, ATT = ATT, chirp_num = chirp_num, window = window, 
+                 beg_p = beg_p, end_p = end_p, beg_t_mark = beg_t_mark, cable1 = cable1, cable2 = cable2, 
+                 TX_power = TX_power, TX_Gain = TX_Gain, RX_Gain = RX_Gain, TX_heigh = TX_heigh, RX_heigh = RX_heigh,
+                 TIME = TIME, D_window = D_window, v_rx = v_rx, v_tx = v_tx)
+        np.savez('./params/channelgain_data.npz', channel_gain = channel_gain)
+        np.savez('./params/dop_paras.npz', fc = fc, c = c, ATT = ATT, chirp_num = chirp_num, window = window, 
+                 beg_p = beg_p, end_p = end_p, beg_t_mark = beg_t_mark, cable1 = cable1, cable2 = cable2, 
+                 TX_power = TX_power, TX_Gain = TX_Gain, RX_Gain = RX_Gain, TX_heigh = TX_heigh, RX_heigh = RX_heigh,
+                 TIME = TIME, D_window = D_window, v_rx = v_rx, v_tx = v_tx, Hz_x = Hz_x)
+        np.savez('./params/dop_data.npz', for_dop = for_dop)
+        
+        
         
         '''
         debug message

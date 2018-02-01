@@ -103,3 +103,5 @@ ENV/
 *.wpr
 *.wpu
 *.pyc
+/results/
+/params/
