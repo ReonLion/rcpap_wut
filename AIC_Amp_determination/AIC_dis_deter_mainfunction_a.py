@@ -5,6 +5,8 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 import timeit
 
+from AIC_algorithm_a import AIC_algorithm_a
+
 class AIC_Amp_determination():
     def __init__(self):
         '''
@@ -36,15 +38,20 @@ class AIC_Amp_determination():
         SM_time = ssf_paras['SM_time']
         SM_distance = ssf_paras['SM_distance']
         TIME = ssf_paras['TIME'] - 1
-        data_x = Amp_DATA['AIC_DATA'].reshape((-1, 1, Amp_DATA['AIC_DATA'].shape[-1]))
-        data_x_new = []
-        for i in range(0, data_x.shape[0]):
-            data_x_new.append(data_x[i])
+        data_x = Amp_DATA['AIC_DATA']
         
         '''
         运行程序开始
         '''
+        area_num = data_x.shape[0]
+        start_p = 1
+        end_p = area_num
         
+        for i in range(0, 1):
+            X = []
+            energy = ATT * np.power(data_x[0].T, 2)
+            X = np.sqrt(energy / np.mean(energy))
+            AIC_algorithm_a(X)
         
         
         '''
@@ -56,6 +63,10 @@ class AIC_Amp_determination():
             print(data_x[0].shape)
             print(data_x[0])
             print(data_x[-1])
+            print('X')
+            print(X.shape)
+            print(X[0:6])
+            print(X[-6:])
             
         
         

@@ -412,7 +412,7 @@ class main_doppler():
                  TIME = TIME, D_window = D_window, v_rx = v_rx, v_tx = v_tx, win_wide = win_wide, SM_time = SM_time,
                  SM_distance = SM_distance)
         np.savez('./params/ssf_data.npz', NB_signal = NB_signal, PL_no_SM = PL_no_SM, Small_scale_fading = Small_scale_fading)
-        np.savez('./params/Amp_DATA.npz', AIC_DATA = AIC_DATA)
+        np.savez('./params/Amp_DATA.npz', AIC_DATA = np.array(AIC_DATA).reshape(len(AIC_DATA), 1, AIC_DATA[0].shape[-1]))
         np.savez('./params/PL_paras.npz', fc = fc, c = c, ATT = ATT, chirp_num = chirp_num, window = window, 
                  beg_p = beg_p, end_p = end_p, beg_t_mark = beg_t_mark, cable1 = cable1, cable2 = cable2, 
                  TX_power = TX_power, TX_Gain = TX_Gain, RX_Gain = RX_Gain, TX_heigh = TX_heigh, RX_heigh = RX_heigh,
@@ -520,7 +520,7 @@ class main_doppler():
             print(AIC_com[0][0:6])
             print(AIC_com[-1][0:6])
             print('AIC_DATA')
-            print(len(AIC_DATA))
+            print((len(AIC_DATA)))
             print(AIC_DATA[0][0:6])
             print(AIC_DATA[-1][0:6])
             print('distance_sm')
