@@ -9,9 +9,6 @@ def AIC_algorithm_a(X):
     sigma = shape
     y = np.sum(np.log(stats.lognorm.pdf(X, shape, loc, scale)), axis = 0)
     
-    #loc, scale = stats.norm.fit(np.log(X))
-    #y = np.sum(np.log(stats.norm.pdf(np.log(X), loc=loc, scale=scale)), axis = 0)
-    
     print(shape)
     print(loc)
     print(scale)
@@ -22,9 +19,9 @@ def AIC_algorithm_a(X):
     print('y')
     print(y)
     
-    #fig = plt.figure()
-    #ax = fig.add_subplot(211)
-    #ax.hist(X)
-    #ax = fig.add_subplot(212)
-    #ax.plot(X, stats.norm.pdf(X, loc=loc, scale=scale))
-    #plt.show()
+    fig = plt.figure()
+    ax = fig.add_subplot(211)
+    ax.hist(X)
+    ax = fig.add_subplot(212)
+    ax.plot(X, stats.lognorm.pdf(X, shape, loc, scale))
+    plt.show()
