@@ -119,7 +119,7 @@ class main_doppler():
             D_window = np.concatenate((D_window, distance[i + 1]), axis = 0)
             TIME = np.concatenate((TIME, time[i + 1]), axis = 0)
             V_Rel = np.concatenate((V_Rel, V_rel[i + 1]), axis = 0)
-        CIR_window_doppler = after_window_cir[0 : np.max(np.shape(TIME))]
+        CIR_window_doppler = after_window_cir[0 : np.shape(TIME)[0]]
         after_window_cir = []
         CIR_1 = []
         
@@ -169,7 +169,7 @@ class main_doppler():
         for num in range(1, num_sm1 - 1):
             Equ_Narr_band = np.concatenate((Equ_Narr_band, CIR_window_doppler[num]), axis = 0)
             
-        Narrow_band_signal = ATT * np.abs(np.power(Equ_Narr_band[0:np.max(np.shape(SM_time)), :], 2))
+        Narrow_band_signal = ATT * np.abs(np.power(Equ_Narr_band[0:np.shape(SM_time)[0], :], 2))
         NB_signal = 10 * np.log10(np.sum(Narrow_band_signal, axis = 1) / C)
         PL_no_SM = 10 * np.log10(PL_no_sm)
         Small_scale_fading = NB_signal - PL_no_SM
@@ -221,7 +221,7 @@ class main_doppler():
         # 具体秒数多普勒频移
         fre_in_domain = 10 * np.log10(ATT * np.power(np.abs(np.fft.fftshift(np.fft.fft(CIR_doppler, axis=0), axes=(0, ))), 2))
         Fre_innor_domain = fre_in_domain - np.max(np.max(fre_in_domain))                                # 归一化操作
-        Fre_resolution = np.floor(chirp_num) / (win_wide * np.max(np.arange(d_begp, d_endp + 0.1).shape))
+        Fre_resolution = np.floor(chirp_num) / (win_wide * np.arange(d_begp, d_endp + 0.1).shape[0])
         # 瞬时多普勒频移再翻转
         Hz_in_x = np.flipud(np.arange(-np.floor(chirp_num / 2), np.floor(chirp_num / 2) + Fre_resolution / 10e4, Fre_resolution))
         RSL = 10 * np.log10(np.sum(pdp_window, axis = 1) / np.shape(pdp_window)[-1])                    # RSL units: dBm
@@ -336,7 +336,7 @@ class main_doppler():
         X = np.arange(t_res, t_res * 2560 + t_res / 10e4, t_res)
         Y = Hz_in_x
         X, Y = np.meshgrid(X, Y)
-        Z = Fre_innor_domain[0 : np.max(np.shape(Hz_in_x)), :]
+        Z = Fre_innor_domain[0 : np.shape(Hz_in_x)[0], :]
     
         fig = plt.figure(tight_layout = True)
         ax = fig.add_subplot(111)

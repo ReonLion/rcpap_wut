@@ -1,5 +1,9 @@
 # coding=utf-8
 import numpy as np
+from matplotlib import pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+import timeit
 
 class AIC_Amp_determination():
     def __init__(self):
@@ -32,17 +36,15 @@ class AIC_Amp_determination():
         SM_time = ssf_paras['SM_time']
         SM_distance = ssf_paras['SM_distance']
         TIME = ssf_paras['TIME'] - 1
-        data_x = Amp_DATA['AIC_DATA']
+        data_x = Amp_DATA['AIC_DATA'].reshape((-1, 1, Amp_DATA['AIC_DATA'].shape[-1]))
+        data_x_new = []
+        for i in range(0, data_x.shape[0]):
+            data_x_new.append(data_x[i])
         
         '''
         运行程序开始
         '''
-        area_num = np.max(data_x.shape)
-        start_p = 1
-        end_p = area_num
         
-        for num in range(0, area_num):
-            X = []
         
         
         '''
@@ -51,9 +53,17 @@ class AIC_Amp_determination():
         if debug_mode:
             print('data_x')
             print(data_x.shape)
-            print(area_num)
+            print(data_x[0].shape)
+            print(data_x[0])
+            print(data_x[-1])
             
         
         
 if __name__ == '__main__':
+    begin_time = timeit.default_timer()
+    
     AIC_Amp_determination()
+    
+    end_time = timeit.default_timer()
+    print('Running time')
+    print(str(end_time - begin_time))
