@@ -49,6 +49,7 @@ class AIC_Amp_determination():
         
         for i in range(0, 1):
             X = []
+            
             energy = ATT * np.power(data_x[0].T, 2)
             X = np.sqrt(energy / np.mean(energy))
             AIC_algorithm_a(X)
