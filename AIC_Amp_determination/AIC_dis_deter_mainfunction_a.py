@@ -54,7 +54,9 @@ class AIC_Amp_determination():
         pdf = []
         sub_pdf = []
         
-        
+        '''
+        实际运行时，请取消下一段注释
+        '''
         #for i in range(0, area_num):
             #energy = ATT * np.power(data_x[i].T, 2)
             #X = np.sqrt(energy / np.mean(energy))

@@ -437,7 +437,7 @@ class main_doppler():
                  beg_p = beg_p, end_p = end_p, beg_t_mark = beg_t_mark, cable1 = cable1, cable2 = cable2, 
                  TX_power = TX_power, TX_Gain = TX_Gain, RX_Gain = RX_Gain, TX_heigh = TX_heigh, RX_heigh = RX_heigh,
                  TIME = TIME, D_window = D_window, v_rx = v_rx, v_tx = v_tx, Hz_x = Hz_x)
-        np.savez('./params/dop_data.npz', for_dop = for_dop)
+        np.savez('./params/dop_data.npz', for_dop = np.array(for_dop).reshape((len(for_dop), for_dop[0].shape[0], for_dop[0].shape[1])))
         
         
         
