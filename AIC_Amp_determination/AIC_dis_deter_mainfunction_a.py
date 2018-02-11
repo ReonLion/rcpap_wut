@@ -1,8 +1,6 @@
 # coding=utf-8
 import numpy as np
 from matplotlib import pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
 import timeit
 
 from AIC_algorithm_a import AIC_algorithm_a
@@ -207,14 +205,97 @@ class AIC_Amp_determination():
         ax.plot(X, p_ray, 'g*', linewidth = 1, label = 'denotes Rayleigh')
         ax.plot(X, p_weib, 'kv', linewidth = 1, label = 'denotes Weibull')
         
-        ax.set_xlim(np.min(TIME), np.max(TIME))
+        ax.set_xlim(np.min(X), np.max(X))
         ax.set_ylim(0, 1)
         ax.set_xlabel('Time in s', fontproperties = 'Times New Roman', fontsize = 10)
         ax.set_ylabel('Optimal amplitude distribution', fontproperties = 'Times New Roman', fontsize = 10)
         ax.grid(True)
         plt.legend(bbox_to_anchor=(1.0, 1), loc=1, borderaxespad=0.5)
         
-        plt.savefig('../results/power_domain/AIC_dis_deter_mainfunction_a_fig1')
+        plt.savefig('../results/power_domain/AIC_dis_deter_mainfunction_a_fig1.png')
+        
+        '''
+        绘制保存fig2
+        '''
+        fig = plt.figure(tight_layout = True)
+        ax = fig.add_subplot(111)
+        
+        X = []
+        for element in Rician_X.flat:
+            X.append(TIME[int(element) - 1])
+        X = np.array(X).flatten().astype('float')
+        
+        ax.plot(X, k_factor, 'b.-', linewidth = 1)
+        
+        ax.set_xlim(np.min(TIME), np.max(TIME))
+        ax.set_ylim(np.min(k_factor), np.max(k_factor))
+        ax.set_xlabel('Time in s', fontproperties = 'Times New Roman', fontsize = 10)
+        ax.set_ylabel('K-factor in dB', fontproperties = 'Times New Roman', fontsize = 10)
+        ax.grid(True)
+        
+        plt.savefig('../results/power_domain/AIC_dis_deter_mainfunction_a_fig2.png')
+        
+        '''
+        绘制保存fig3
+        '''
+        fig = plt.figure(tight_layout = True)
+        ax = fig.add_subplot(111)
+        
+        X = X
+        
+        ax.plot(X, RHO, 'b.', linewidth = 1.5, label = 'RHO')
+        ax.plot(X, SIGMA, 'r.', linewidth = 1.5, label = 'SIGMA')
+        
+        ax.set_xlim(np.min(TIME), np.max(TIME))
+        ax.set_ylim(min(np.min(RHO), np.min(SIGMA)), max(np.max(RHO), np.max(SIGMA)))
+        ax.set_xlabel('Time in s', fontproperties = 'Times New Roman', fontsize = 10)
+        ax.set_ylabel('RHO & SIGMA', fontproperties = 'Times New Roman', fontsize = 10)
+        ax.grid(True)
+        plt.legend(bbox_to_anchor=(1.0, 1), loc=1, borderaxespad=0.5)
+        
+        plt.savefig('../results/power_domain/AIC_dis_deter_mainfunction_a_fig3.png')
+        
+        '''
+        绘制保存fig4
+        '''
+        fig = plt.figure(tight_layout = True)
+        ax = fig.add_subplot(111)
+        
+        X = []
+        for element in Nakagami_X.flat:
+            X.append(TIME[int(element) - 1])
+        X = np.array(X).flatten().astype('float')
+        
+        ax.plot(X, MU, 'b.', linewidth = 1.5)
+        
+        ax.set_xlabel('Time in s', fontproperties = 'Times New Roman', fontsize = 10)
+        ax.set_ylabel('The magnitude of m-factor', fontproperties = 'Times New Roman', fontsize = 10)
+        ax.grid(True)
+        
+        plt.savefig('../results/power_domain/AIC_dis_deter_mainfunction_a_fig4.png')
+        
+        '''
+        绘制保存fig5
+        '''
+        fig = plt.figure(tight_layout = True)
+        ax = fig.add_subplot(111)
+        
+        X = []
+        for element in Weibull_X.flat:
+            X.append(TIME[int(element) - 1])
+        X = np.array(X).flatten().astype('float')
+        
+        ax.plot(X, Weibull_a, 'ko', linewidth = 1, label = 'Scale parameter')
+        ax.plot(X, Weibull_b, 'rp', linewidth = 1, label = 'Shape parameter')
+        
+        ax.set_xlim(np.min(TIME), np.max(TIME))
+        ax.set_ylim(min(np.min(Weibull_a), np.min(Weibull_b)), max(np.max(Weibull_a), np.max(Weibull_b)))
+        ax.set_xlabel('Time in s', fontproperties = 'Times New Roman', fontsize = 10)
+        ax.set_ylabel('Magnitude', fontproperties = 'Times New Roman', fontsize = 10)
+        ax.grid(True)
+        plt.legend(bbox_to_anchor=(1.0, 1), loc=1, borderaxespad=0.5)
+        
+        plt.savefig('../results/power_domain/AIC_dis_deter_mainfunction_a_fig5.png')
         
         '''
         debug message
