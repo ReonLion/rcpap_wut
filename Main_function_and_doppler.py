@@ -405,7 +405,7 @@ class main_doppler():
                  beg_p = beg_p, end_p = end_p, beg_t_mark = beg_t_mark, cable1 = cable1, cable2 = cable2, 
                  TX_power = TX_power, TX_Gain = TX_Gain, RX_Gain = RX_Gain, TX_heigh = TX_heigh, RX_heigh = RX_heigh,
                  TIME = TIME, D_window = D_window, v_rx = v_rx, v_tx = v_tx)
-        np.savez('./params/delay_data.npz', after_window = after_window)
+        np.savez('./params/delay_data.npz', after_window = np.array(after_window).reshape((len(after_window), after_window[0].shape[0], after_window[0].shape[1])))
         np.savez('./params/ssf_paras.npz', fc = fc, c = c, ATT = ATT, chirp_num = chirp_num, window = window, 
                  beg_p = beg_p, end_p = end_p, beg_t_mark = beg_t_mark, cable1 = cable1, cable2 = cable2, 
                  TX_power = TX_power, TX_Gain = TX_Gain, RX_Gain = RX_Gain, TX_heigh = TX_heigh, RX_heigh = RX_heigh,

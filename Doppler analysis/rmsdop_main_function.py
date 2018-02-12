@@ -97,7 +97,7 @@ class rmsdop():
         ax.set_ylabel('Mean Doppler in Hz', fontproperties = 'Times New Roman', fontsize = 10)
         ax.grid(True)
         
-        plt.savefig('../results/power_domain/rmsdop_main_function_fig3.png')
+        plt.savefig('../results/frequency_domain/rmsdop_main_function_fig3.png')
         
         '''
         绘制保存fig4
@@ -113,7 +113,7 @@ class rmsdop():
         ax.set_ylabel('RMS Doppler in Hz', fontproperties = 'Times New Roman', fontsize = 10)
         ax.grid(True)
     
-        plt.savefig('../results/power_domain/rmsdop_main_function_fig4.png')
+        plt.savefig('../results/frequency_domain/rmsdop_main_function_fig4.png')
         
         '''
         绘制保存fig6
@@ -134,7 +134,7 @@ class rmsdop():
         ax.set_ylabel('CDF of mean Doppler', fontproperties = 'Times New Roman', fontsize = 10)
         ax.grid(True)
     
-        plt.savefig('../results/power_domain/rmsdop_main_function_fig6.png')
+        plt.savefig('../results/frequency_domain/rmsdop_main_function_fig6.png')
         
         '''
         绘制保存fig8
@@ -155,7 +155,7 @@ class rmsdop():
         ax.set_ylabel('CDF of RMS Doppler', fontproperties = 'Times New Roman', fontsize = 10)
         ax.grid(True)
     
-        plt.savefig('../results/power_domain/rmsdop_main_function_fig8.png')
+        plt.savefig('../results/frequency_domain/rmsdop_main_function_fig8.png')
         
         '''
         绘制保存fig9
@@ -169,7 +169,7 @@ class rmsdop():
         ax.set_ylabel('PDF of mean Doppler', fontproperties = 'Times New Roman', fontsize = 10)
         ax.grid(True)
     
-        plt.savefig('../results/power_domain/rmsdop_main_function_fig9.png')
+        plt.savefig('../results/frequency_domain/rmsdop_main_function_fig9.png')
         
         '''
         绘制保存fig10
@@ -183,7 +183,7 @@ class rmsdop():
         ax.set_ylabel('PDF of RMS Doppler', fontproperties = 'Times New Roman', fontsize = 10)
         ax.grid(True)
     
-        plt.savefig('../results/power_domain/rmsdop_main_function_fig10.png')
+        plt.savefig('../results/frequency_domain/rmsdop_main_function_fig10.png')
         
         '''
         debug message
