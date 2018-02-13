@@ -75,9 +75,62 @@ class rmsdelay_pathnum_analysis():
         path_num = np.array(path_num)
         
         '''
+        图形生成程序
+        '''
+        
+        '''
+        绘制保存fig1
+        '''
+        fig = plt.figure(tight_layout = True)
+        ax = fig.add_subplot(111)
+        ax.plot(TIME, path_num, 'b')
+        ax.grid(True)
+        plt.savefig('../results/delay_domain/rmsdelay_pathnum_analysis_main_function_fig1.png')
+        
+        '''
+        绘制保存fig2
+        '''
+        fig = plt.figure(tight_layout = True)
+        ax = fig.add_subplot(111)
+        ax.plot(D_window, path_num, 'b')
+        ax.grid(True)
+        plt.savefig('../results/delay_domain/rmsdelay_pathnum_analysis_main_function_fig2.png')
+        
+        '''
+        绘制保存fig3
+        '''
+        fig = plt.figure(tight_layout = True)
+        ax = fig.add_subplot(111)
+        ax.plot(D_window, Trms, 'b')
+        ax.grid(True)
+        plt.savefig('../results/delay_domain/rmsdelay_pathnum_analysis_main_function_fig3.png')
+        
+        '''
+        绘制保存fig4
+        '''
+        fig = plt.figure(tight_layout = True)
+        ax = fig.add_subplot(111)
+        ax.plot(TIME, Trms, 'b')
+        ax.grid(True)
+        plt.savefig('../results/delay_domain/rmsdelay_pathnum_analysis_main_function_fig4.png')        
+        
+        '''
+        保存变量，供Delay_statisti使用
+        '''
+        #TIME = TIME
+        #TM = Tm
+        #TRMS = Trms
+        #num_path = path_num
+        #X_axis = D_window
+        
+        np.savez('../params/RMS_results.npz', TIME = TIME, TM = Tm, TRMS = Trms, num_path = path_num, X_axis = D_window)
+        
+        '''
         debug message
         '''
         if debug_mode:
+            print('D_window')
+            print(D_window.shape)
             print('delay_data')
             print(delay_data.shape)
             print(delay_data[0][0, 0:6])
