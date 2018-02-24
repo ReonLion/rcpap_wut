@@ -4,17 +4,17 @@ from statsmodels.nonparametric.smoothers_lowess import lowess
 from matplotlib import pyplot as plt
 import timeit
 
-from Meas_LCR_AFD import Meas_LCR_AFD
+from power_domain.Meas_LCR_AFD import Meas_LCR_AFD
 
 class small_scale_fading():
-    def __init__(self):
+    def __init__(self, **kwargs):
         '''
         设置debug模式
         '''
         debug_mode = True
         
-        ssf_paras = np.load('../params/ssf_paras.npz')
-        ssf_data = np.load('../params/ssf_data.npz')
+        ssf_paras = np.load('./params/ssf_paras.npz')
+        ssf_data = np.load('./params/ssf_data.npz')
         
         '''
         测试参数录入
@@ -44,16 +44,16 @@ class small_scale_fading():
         '''
         取用数据设置
         '''
-        beg_point = 7202
-        end_point = 9300
+        beg_point = kwargs['small_scale_beg_point']
+        end_point = kwargs['small_scale_end_point']
         T = SM_time[beg_point-1 : end_point]
         Dis = SM_distance[beg_point-1 : end_point]
         RSL_all = NB_signal[beg_point-1 : end_point]
         RSL_n_ssf = PL_no_SM[beg_point-1 : end_point]
         SSF = Small_scale_fading[beg_point-1 : end_point]
         ssf1 = 10 ** (SSF / 10)
-        beg_ssf_point = 1
-        end_ssf_point = 9300 - 7202
+        beg_ssf_point = kwargs['small_scale_beg_ssf_point']
+        end_ssf_point = kwargs['small_scale_end_ssf_point']
         ssf = ssf1[beg_ssf_point-1 : end_ssf_point]
         data_length = np.shape(ssf)[0]
         
@@ -90,7 +90,10 @@ class small_scale_fading():
         ax.plot(T, SSF, 'b')
         ax.grid(True)
         
-        plt.savefig('../results/power_domain/small_scale_fading_mainfunction_fig1.png')
+        plt.savefig('./results/power_domain/small_scale_fading_mainfunction_fig1.png')
+        plt.clf()
+        # 保存此图变量
+        np.savez('./plot_params/small_scale_fading_mainfunction_fig1.npz', T=T, RSL_all=RSL_all, RSL_n_ssf=RSL_n_ssf, SSF=SSF)
         
         '''
         绘制保存fig2
@@ -106,7 +109,10 @@ class small_scale_fading():
         ax.plot(Dis, SSF, 'b')
         ax.grid(True)
     
-        plt.savefig('../results/power_domain/small_scale_fading_mainfunction_fig2.png')
+        plt.savefig('./results/power_domain/small_scale_fading_mainfunction_fig2.png')
+        plt.clf()
+        # 保存此图变量
+        np.savez('./plot_params/small_scale_fading_mainfunction_fig2.npz', Dis=Dis, RSL_all=RSL_all, RSL_n_ssf=RSL_n_ssf, SSF=SSF)
         
         '''
         绘制保存fig3
@@ -119,7 +125,10 @@ class small_scale_fading():
         ax.set_ylabel('Received signal level in dBm', fontproperties = 'Times New Roman', fontsize = 8)
         ax.grid(True)
         
-        plt.savefig('../results/power_domain/small_scale_fading_mainfunction_fig3.png')
+        plt.savefig('./results/power_domain/small_scale_fading_mainfunction_fig3.png')
+        plt.clf()
+        # 保存此图变量
+        np.savez('./plot_params/small_scale_fading_mainfunction_fig3.npz', Dis=Dis, RSL_all=RSL_all)
         
         '''
         绘制保存fig4
@@ -137,7 +146,10 @@ class small_scale_fading():
         ax.grid(True)
         plt.legend(bbox_to_anchor=(1.0, 1), loc=1, borderaxespad=0.5)
     
-        plt.savefig('../results/power_domain/small_scale_fading_mainfunction_fig4.png')
+        plt.savefig('./results/power_domain/small_scale_fading_mainfunction_fig4.png')
+        plt.clf()
+        # 保存此图变量
+        np.savez('./plot_params/small_scale_fading_mainfunction_fig4.npz', T=T, RSL_all=RSL_all, RSL_n_ssf=RSL_n_ssf)
         
         '''
         绘制保存fig5
@@ -153,7 +165,10 @@ class small_scale_fading():
         ax.set_ylabel('Small scale fading in dB', fontproperties = 'Times New Roman', fontsize = 10)
         ax.grid(True)
         
-        plt.savefig('../results/power_domain/small_scale_fading_mainfunction_fig5.png')
+        plt.savefig('./results/power_domain/small_scale_fading_mainfunction_fig5.png')
+        plt.clf()
+        # 保存此图变量
+        np.savez('./plot_params/small_scale_fading_mainfunction_fig5.npz', T=T, SSF=SSF)
         
         '''
         绘制保存fig6
@@ -170,7 +185,10 @@ class small_scale_fading():
         ax.set_ylabel('LCR (times per second)', fontproperties = 'Times New Roman', fontsize = 10)
         ax.grid(True)
     
-        plt.savefig('../results/power_domain/small_scale_fading_mainfunction_fig6.png')
+        plt.savefig('./results/power_domain/small_scale_fading_mainfunction_fig6.png')
+        plt.clf()
+        # 保存此图变量
+        np.savez('./plot_params/small_scale_fading_mainfunction_fig6.npz', lowess_LCR_per_second=lowess_LCR_per_second, LCR_per_second=LCR_per_second)
         
         '''
         绘制保存fig7
@@ -187,7 +205,10 @@ class small_scale_fading():
         ax.set_ylabel('ADF (seconds)', fontproperties = 'Times New Roman', fontsize = 10)
         ax.grid(True)
     
-        plt.savefig('../results/power_domain/small_scale_fading_mainfunction_fig7.png')
+        plt.savefig('./results/power_domain/small_scale_fading_mainfunction_fig7.png')
+        plt.clf()
+        # 保存此图变量
+        np.savez('./plot_params/small_scale_fading_mainfunction_fig7.npz', lowess_AFD=lowess_AFD, AFD=AFD)
         
         '''
         绘制保存fig8
@@ -197,7 +218,12 @@ class small_scale_fading():
         
         ax.plot(SSF, 'b', linewidth = 1.5)
         
-        plt.savefig('../results/power_domain/small_scale_fading_mainfunction_fig8.png')
+        plt.savefig('./results/power_domain/small_scale_fading_mainfunction_fig8.png')
+        plt.clf()
+        # 保存此图变量
+        np.savez('./plot_params/small_scale_fading_mainfunction_fig8.npz', SSF=SSF)
+        
+        plt.close('all')
         
         
         if debug_mode:

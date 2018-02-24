@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from path_selection_diff_fun import path_selection_diff_fun
+from delay_analysis.path_selection_diff_fun import path_selection_diff_fun
 
 def Tm_Trms_fun(ss_reg, Thre_n):
     index_final = path_selection_diff_fun(ss_reg, Thre_n)

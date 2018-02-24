@@ -4,7 +4,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 import timeit
 
-from Dm_Drms_fun import Dm_Drms_fun
+from Doppler_analysis.Dm_Drms_fun import Dm_Drms_fun
 
 class rmsdop():
     def __init__(self):
@@ -13,8 +13,8 @@ class rmsdop():
         '''
         debug_mode = True
         
-        dop_paras = np.load('../params/dop_paras.npz')
-        dop_data_cache = np.load('../params/dop_data.npz')
+        dop_paras = np.load('./params/dop_paras.npz')
+        dop_data_cache = np.load('./params/dop_data.npz')
         
         '''
         测试参数录入
@@ -97,7 +97,10 @@ class rmsdop():
         ax.set_ylabel('Mean Doppler in Hz', fontproperties = 'Times New Roman', fontsize = 10)
         ax.grid(True)
         
-        plt.savefig('../results/frequency_domain/rmsdop_main_function_fig3.png')
+        plt.savefig('./results/frequency_domain/rmsdop_main_function_fig3.png')
+        plt.clf()
+        # 保存此图变量
+        np.savez('./plot_params/rmsdop_main_function_fig3.npz', TIME=TIME, Dm=Dm)
         
         '''
         绘制保存fig4
@@ -113,7 +116,10 @@ class rmsdop():
         ax.set_ylabel('RMS Doppler in Hz', fontproperties = 'Times New Roman', fontsize = 10)
         ax.grid(True)
     
-        plt.savefig('../results/frequency_domain/rmsdop_main_function_fig4.png')
+        plt.savefig('./results/frequency_domain/rmsdop_main_function_fig4.png')
+        plt.clf()
+        # 保存此图变量
+        np.savez('./plot_params/rmsdop_main_function_fig4.npz', TIME=TIME, Drms=Drms)
         
         '''
         绘制保存fig6
@@ -134,7 +140,10 @@ class rmsdop():
         ax.set_ylabel('CDF of mean Doppler', fontproperties = 'Times New Roman', fontsize = 10)
         ax.grid(True)
     
-        plt.savefig('../results/frequency_domain/rmsdop_main_function_fig6.png')
+        plt.savefig('./results/frequency_domain/rmsdop_main_function_fig6.png')
+        plt.clf()
+        # 保存此图变量
+        np.savez('./plot_params/rmsdop_main_function_fig6.npz', Dm=Dm)
         
         '''
         绘制保存fig8
@@ -155,7 +164,10 @@ class rmsdop():
         ax.set_ylabel('CDF of RMS Doppler', fontproperties = 'Times New Roman', fontsize = 10)
         ax.grid(True)
     
-        plt.savefig('../results/frequency_domain/rmsdop_main_function_fig8.png')
+        plt.savefig('./results/frequency_domain/rmsdop_main_function_fig8.png')
+        plt.clf()
+        # 保存此图变量
+        np.savez('./plot_params/rmsdop_main_function_fig8.npz', Drms=Drms)
         
         '''
         绘制保存fig9
@@ -169,7 +181,10 @@ class rmsdop():
         ax.set_ylabel('PDF of mean Doppler', fontproperties = 'Times New Roman', fontsize = 10)
         ax.grid(True)
     
-        plt.savefig('../results/frequency_domain/rmsdop_main_function_fig9.png')
+        plt.savefig('./results/frequency_domain/rmsdop_main_function_fig9.png')
+        plt.clf()
+        # 保存此图变量
+        np.savez('./plot_params/rmsdop_main_function_fig9.npz', b1=b1, A1=A1)
         
         '''
         绘制保存fig10
@@ -183,7 +198,12 @@ class rmsdop():
         ax.set_ylabel('PDF of RMS Doppler', fontproperties = 'Times New Roman', fontsize = 10)
         ax.grid(True)
     
-        plt.savefig('../results/frequency_domain/rmsdop_main_function_fig10.png')
+        plt.savefig('./results/frequency_domain/rmsdop_main_function_fig10.png')
+        plt.clf()
+        # 保存此图变量
+        np.savez('./plot_params/rmsdop_main_function_fig10.npz', b2=b2, A2=A2)
+        
+        plt.close('all')
         
         '''
         debug message

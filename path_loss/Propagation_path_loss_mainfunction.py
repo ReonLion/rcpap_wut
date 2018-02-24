@@ -5,18 +5,18 @@ from scipy.special import erfc
 from matplotlib import pyplot as plt
 import timeit
 
-from fun_N import fun_N
-from GRG_MAPE import GRG_MAPE_AVRG, GRG_MAPE_delta, GRG_MAPE_R, GRG_MAPE_r1, pearson_fun
+from path_loss.fun_N import fun_N
+from path_loss.GRG_MAPE import GRG_MAPE_AVRG, GRG_MAPE_delta, GRG_MAPE_R, GRG_MAPE_r1, pearson_fun
 
 class Propagation_path_loss():
-    def __init__(self):
+    def __init__(self, **kwargs):
         '''
         设置Debug模式
         '''
         debug_mode = True
         
-        PL_paras = np.load('../params/PL_paras.npz')
-        PL_data = np.load('../params/PL_data.npz')
+        PL_paras = np.load('./params/PL_paras.npz')
+        PL_data = np.load('./params/PL_data.npz')
         
         fc = PL_paras['fc'] / 1e9
         c = PL_paras['c']
@@ -40,7 +40,8 @@ class Propagation_path_loss():
         '''
         取用数据设置
         '''
-        polar = 3
+        polar = kwargs['path_loss_polar']
+        print(polar)
         beg_point = 1
         end_point = np.shape(rsl)[0]
         distance = D_window[beg_point - 1 : end_point]
@@ -50,7 +51,8 @@ class Propagation_path_loss():
         Yxin_b = 7e-5
         r_e = 6371
         daierta = 0.001
-        dielectric = 3
+        dielectric = kwargs['path_loss_dielectric']
+        print(dielectric)
         
         '''
         运行程序开始
@@ -653,7 +655,14 @@ class Propagation_path_loss():
         ax.grid(True)
         plt.legend(bbox_to_anchor=(0, 1), loc='upper left', borderaxespad=0.5)
         
-        plt.savefig('../results/power_domain/Propagation_path_loss_mainfunction_fig1.png')
+        plt.savefig('./results/power_domain/Propagation_path_loss_mainfunction_fig1.png')
+        plt.clf()
+        # 保存此图变量
+        np.savez('./plot_params/Propagation_path_loss_mainfunction_fig1.npz', M_distance=M_distance, PL=PL, 
+                 One_slope=One_slope, REL=REL, Free_space=Free_space, WINNER_B1=WINNER_B1, WINNER_C2=WINNER_C2,
+                 ITU_R_u=ITU_R_u, ITU_R_l=ITU_R_l, ITU_R_m=ITU_R_m)
+        
+        plt.close('all')
         
         '''
         debug message

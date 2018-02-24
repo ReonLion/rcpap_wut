@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import stats
 
-from err_info_dic import err_info
+from AIC_Amp_determination.err_info_dic import err_info
 
 def AIC_ruisi_a(*varargin):
     if len(varargin) > 6:

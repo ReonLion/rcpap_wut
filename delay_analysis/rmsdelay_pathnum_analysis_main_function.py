@@ -4,7 +4,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 import timeit
 
-from Tm_Trms_fun import Tm_Trms_fun
+from delay_analysis.Tm_Trms_fun import Tm_Trms_fun
 
 class rmsdelay_pathnum_analysis():
     def __init__(self):
@@ -13,8 +13,8 @@ class rmsdelay_pathnum_analysis():
         '''
         debug_mode = True
     
-        delay_paras = np.load('../params/delay_paras.npz')
-        delay_data_cache = np.load('../params/delay_data.npz')
+        delay_paras = np.load('./params/delay_paras.npz')
+        delay_data_cache = np.load('./params/delay_data.npz')
         
         '''
         测试参数录入
@@ -85,7 +85,10 @@ class rmsdelay_pathnum_analysis():
         ax = fig.add_subplot(111)
         ax.plot(TIME, path_num, 'b')
         ax.grid(True)
-        plt.savefig('../results/delay_domain/rmsdelay_pathnum_analysis_main_function_fig1.png')
+        plt.savefig('./results/delay_domain/rmsdelay_pathnum_analysis_main_function_fig1.png')
+        plt.clf()
+        # 保存此图变量
+        np.savez('./plot_params/rmsdelay_pathnum_analysis_main_function_fig1.npz', X=TIME, Y=path_num)
         
         '''
         绘制保存fig2
@@ -94,7 +97,10 @@ class rmsdelay_pathnum_analysis():
         ax = fig.add_subplot(111)
         ax.plot(D_window, path_num, 'b')
         ax.grid(True)
-        plt.savefig('../results/delay_domain/rmsdelay_pathnum_analysis_main_function_fig2.png')
+        plt.savefig('./results/delay_domain/rmsdelay_pathnum_analysis_main_function_fig2.png')
+        plt.clf()
+        # 保存此图变量
+        np.savez('./plot_params/rmsdelay_pathnum_analysis_main_function_fig2.npz', X=D_window, Y=path_num)
         
         '''
         绘制保存fig3
@@ -103,7 +109,10 @@ class rmsdelay_pathnum_analysis():
         ax = fig.add_subplot(111)
         ax.plot(D_window, Trms, 'b')
         ax.grid(True)
-        plt.savefig('../results/delay_domain/rmsdelay_pathnum_analysis_main_function_fig3.png')
+        plt.savefig('./results/delay_domain/rmsdelay_pathnum_analysis_main_function_fig3.png')
+        plt.clf()
+        # 保存此图变量
+        np.savez('./plot_params/rmsdelay_pathnum_analysis_main_function_fig3.npz', X=D_window, Y=Trms)
         
         '''
         绘制保存fig4
@@ -112,7 +121,12 @@ class rmsdelay_pathnum_analysis():
         ax = fig.add_subplot(111)
         ax.plot(TIME, Trms, 'b')
         ax.grid(True)
-        plt.savefig('../results/delay_domain/rmsdelay_pathnum_analysis_main_function_fig4.png')        
+        plt.savefig('./results/delay_domain/rmsdelay_pathnum_analysis_main_function_fig4.png')
+        plt.clf()
+        # 保存此图变量
+        np.savez('./plot_params/rmsdelay_pathnum_analysis_main_function_fig4.npz', X=TIME, Y=Trms)
+        
+        plt.close('all')
         
         '''
         保存变量，供Delay_statisti使用
@@ -123,7 +137,7 @@ class rmsdelay_pathnum_analysis():
         #num_path = path_num
         #X_axis = D_window
         
-        np.savez('../params/RMS_results.npz', TIME = TIME, TM = Tm, TRMS = Trms, num_path = path_num, X_axis = D_window)
+        #np.savez('./params/RMS_results.npz', TIME = TIME, TM = Tm, TRMS = Trms, num_path = path_num, X_axis = D_window)
         
         '''
         debug message

@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 import timeit
 
-from AIC_algorithm_a import AIC_algorithm_a
+from AIC_Amp_determination.AIC_algorithm_a import AIC_algorithm_a
 
 class AIC_Amp_determination():
     def __init__(self):
@@ -12,8 +12,8 @@ class AIC_Amp_determination():
         '''
         debug_mode = True
         
-        ssf_paras = np.load('../params/ssf_paras.npz')
-        Amp_DATA = np.load('../params/Amp_DATA.npz')
+        ssf_paras = np.load('./params/ssf_paras.npz')
+        Amp_DATA = np.load('./params/Amp_DATA.npz')
         
         '''
         测试参数录入
@@ -57,37 +57,37 @@ class AIC_Amp_determination():
         '''
         实际运行时，请取消下一段注释
         '''
-        #for i in range(0, area_num):
-            #energy = ATT * np.power(data_x[i].T, 2)
-            #X = np.sqrt(energy / np.mean(energy))
-            #full_aic_weights, pd_information, index, sub_index, aic_logn[i], aic_nak[i], aic_rice[i], aic_ray[i], aic_weib[i] = AIC_algorithm_a(X)
+        for i in range(0, area_num):
+            energy = ATT * np.power(data_x[i].T, 2)
+            X = np.sqrt(energy / np.mean(energy))
+            full_aic_weights, pd_information, index, sub_index, aic_logn[i], aic_nak[i], aic_rice[i], aic_ray[i], aic_weib[i] = AIC_algorithm_a(X)
             
-            #key_information.append(pd_information)
-            #pdf.append(index + 1)
-            #sub_pdf.append(sub_index + 1)
-            #aic_logn = np.array(aic_logn)
-            #aic_nak = np.array(aic_nak)
-            #aic_rice = np.array(aic_rice)
-            #aic_ray = np.array(aic_ray)
-            #aic_weib = np.array(aic_weib)
+            key_information.append(pd_information)
+            pdf.append(index + 1)
+            sub_pdf.append(sub_index + 1)
+            aic_logn = np.array(aic_logn)
+            aic_nak = np.array(aic_nak)
+            aic_rice = np.array(aic_rice)
+            aic_ray = np.array(aic_ray)
+            aic_weib = np.array(aic_weib)
         
-        #key_information = np.array(key_information).reshape(area_num, pd_information.shape[0], pd_information.shape[1], pd_information.shape[2])
-        #pdf = np.array(pdf).flatten()
-        #sub_pdf = np.array(sub_pdf).flatten()
-        #aic = np.concatenate((aic_logn, aic_nak, aic_rice, aic_ray, aic_weib), axis = 0).reshape(-1, area_num).astype('float')
+        key_information = np.array(key_information).reshape(area_num, pd_information.shape[0], pd_information.shape[1], pd_information.shape[2])
+        pdf = np.array(pdf).flatten()
+        sub_pdf = np.array(sub_pdf).flatten()
+        aic = np.concatenate((aic_logn, aic_nak, aic_rice, aic_ray, aic_weib), axis = 0).reshape(-1, area_num).astype('float')
         
-        #np.savez('../params/cache.npz', full_aic_weights = full_aic_weights, key_information = key_information, pdf = pdf,
+        #np.savez('./params/cache.npz', full_aic_weights = full_aic_weights, key_information = key_information, pdf = pdf,
                      #sub_pdf = sub_pdf, aic = aic)
         
-        '''
-        读取上次循环的数据，节省时间
-        '''
-        data = np.load('../params/cache.npz')
-        full_aic_weights = data['full_aic_weights']
-        key_information = data['key_information']
-        pdf = data['pdf']
-        sub_pdf = data['sub_pdf']
-        aic = data['aic']
+        #'''
+        #读取上次循环的数据，节省时间
+        #'''
+        #data = np.load('./params/cache.npz')
+        #full_aic_weights = data['full_aic_weights']
+        #key_information = data['key_information']
+        #pdf = data['pdf']
+        #sub_pdf = data['sub_pdf']
+        #aic = data['aic']
         
         fai = []
         for mm in range(0, area_num):
@@ -214,7 +214,11 @@ class AIC_Amp_determination():
         ax.grid(True)
         plt.legend(bbox_to_anchor=(1.0, 1), loc=1, borderaxespad=0.5)
         
-        plt.savefig('../results/power_domain/AIC_dis_deter_mainfunction_a_fig1.png')
+        plt.savefig('./results/power_domain/AIC_dis_deter_mainfunction_a_fig1.png')
+        plt.clf()
+        # 保存此图变量
+        np.savez('./plot_params/AIC_dis_deter_mainfunction_a_fig1.npz', X=X, p_logn=p_logn, p_naka=p_naka, p_rice=p_rice,
+                 p_ray=p_ray, p_weib=p_weib)
         
         '''
         绘制保存fig2
@@ -235,7 +239,10 @@ class AIC_Amp_determination():
         ax.set_ylabel('K-factor in dB', fontproperties = 'Times New Roman', fontsize = 10)
         ax.grid(True)
         
-        plt.savefig('../results/power_domain/AIC_dis_deter_mainfunction_a_fig2.png')
+        plt.savefig('./results/power_domain/AIC_dis_deter_mainfunction_a_fig2.png')
+        plt.clf()
+        # 保存此图变量
+        np.savez('./plot_params/AIC_dis_deter_mainfunction_a_fig2.npz', X=X, k_factor=k_factor, TIME=TIME)
         
         '''
         绘制保存fig3
@@ -255,7 +262,10 @@ class AIC_Amp_determination():
         ax.grid(True)
         plt.legend(bbox_to_anchor=(1.0, 1), loc=1, borderaxespad=0.5)
         
-        plt.savefig('../results/power_domain/AIC_dis_deter_mainfunction_a_fig3.png')
+        plt.savefig('./results/power_domain/AIC_dis_deter_mainfunction_a_fig3.png')
+        plt.clf()
+        # 保存此图变量
+        np.savez('./plot_params/AIC_dis_deter_mainfunction_a_fig3.npz', X=X, RHO=RHO, SIGMA=SIGMA, TIME=TIME)
         
         '''
         绘制保存fig4
@@ -274,7 +284,10 @@ class AIC_Amp_determination():
         ax.set_ylabel('The magnitude of m-factor', fontproperties = 'Times New Roman', fontsize = 10)
         ax.grid(True)
         
-        plt.savefig('../results/power_domain/AIC_dis_deter_mainfunction_a_fig4.png')
+        plt.savefig('./results/power_domain/AIC_dis_deter_mainfunction_a_fig4.png')
+        plt.clf()
+        # 保存此图变量
+        np.savez('./plot_params/AIC_dis_deter_mainfunction_a_fig4.npz', X=X, MU=MU)
         
         '''
         绘制保存fig5
@@ -297,7 +310,12 @@ class AIC_Amp_determination():
         ax.grid(True)
         plt.legend(bbox_to_anchor=(1.0, 1), loc=1, borderaxespad=0.5)
         
-        plt.savefig('../results/power_domain/AIC_dis_deter_mainfunction_a_fig5.png')
+        plt.savefig('./results/power_domain/AIC_dis_deter_mainfunction_a_fig5.png')
+        plt.clf()
+        # 保存此图变量
+        np.savez('./plot_params/AIC_dis_deter_mainfunction_a_fig5.npz', X=X, Weibull_a=Weibull_a, Weibull_b=Weibull_b, TIME=TIME)
+        
+        plt.close('all')
         
         '''
         debug message

@@ -2,7 +2,7 @@
 import numpy as np
 from scipy import stats
 
-from AIC_ruisi_a import AIC_ruisi_a
+from AIC_Amp_determination.AIC_ruisi_a import AIC_ruisi_a
 
 def AIC_algorithm_a(X):
     try:

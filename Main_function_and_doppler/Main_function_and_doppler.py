@@ -4,25 +4,27 @@ from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 import timeit
+import os
+import sys
 
-from txt_read import txt_read
-from xls_read import tx_xls_read, rx_xls_read
-from Att_mark import Att_mark
-from GPS_2_distance import GPS_2_distance
-from signal_window import signal_window
-from CIR_window import CIR_window
-from distance_match import distance_match
-from time_match import time_match
-from speed_match import speed_match
-from MakeChirp import MakeChirp
-from small_scale_match import small_scale_match
+from Main_function_and_doppler.txt_read import txt_read
+from Main_function_and_doppler.xls_read import tx_xls_read, rx_xls_read
+from Main_function_and_doppler.Att_mark import Att_mark
+from Main_function_and_doppler.GPS_2_distance import GPS_2_distance
+from Main_function_and_doppler.signal_window import signal_window
+from Main_function_and_doppler.CIR_window import CIR_window
+from Main_function_and_doppler.distance_match import distance_match
+from Main_function_and_doppler.time_match import time_match
+from Main_function_and_doppler.speed_match import speed_match
+from Main_function_and_doppler.MakeChirp import MakeChirp
+from Main_function_and_doppler.small_scale_match import small_scale_match
 
 class main_doppler():
-    def __init__(self):
+    def __init__(self, **kwargs):
         '''
         设置Debug模式
         '''
-        debug_mode = True
+        debug_mode = False
         
         '''
         设置t_start和t_stop
@@ -33,9 +35,17 @@ class main_doppler():
         '''
         读取txt, xls的信息
         '''
-        txt_info = txt_read('txt')
-        tx_xls = tx_xls_read('excel/81_out_tx.xls', t_start, t_stop)
-        rx_xls = rx_xls_read('excel/81_out_rx.xls', t_start, t_stop)
+        txt_info = txt_read(kwargs['txt_folder'])
+        
+        '''
+        从UI选择的文件夹里选择xls文件
+        '''
+        rx_file, tx_file = self.xls_folder_process(kwargs['xls_folder'])
+        '''
+        --------------------------------------------------------------------------------------
+        '''
+        tx_xls = tx_xls_read(tx_file, t_start, t_stop)
+        rx_xls = rx_xls_read(rx_file, t_start, t_stop)
         
         signal_CIR = txt_info.signal_CIR                               # signal_CIR为一个(txt文件数目)大小的列表
         GPS_rx = rx_xls.GPS_rx
@@ -49,18 +59,18 @@ class main_doppler():
         '''
         beg_p = 1                                                      # 数据起始点设置，从第二个chirp开始(由于第一个chirp不对所有的RSL数据都比RX位置数据多了1, 但此处也要注意)2对应了GPS坐标1
         end_p = 6                                                      # 数据终止点设置，32对应了GPS坐标31
-        window = 10                                                    # 窗设置，例如此处设为 20 lambda
+        window = kwargs['window']                                      # 窗设置，例如此处设为 20 lambda
         beg_t_mark = 0                                                 # 起始点时间序号，例如此数据共50s，因此，此时值为 0
         t_res = 10                                                     # unit:ns,esolution
         
         '''
         天线参数设置
         '''
-        TX_power = 16                                                  # 天线发射功率 16 dBm
-        TX_Gain = 2                                                    # 发射天线增益 2 dBi
-        RX_Gain = 10                                                   # 接收天线增益 2 dBi
-        TX_heigh = 1.57                                                # 发射天线有效高度 m
-        RX_heigh = 1.78                                                # 接收天线有效高度 m
+        TX_power = kwargs['TX_power']                                  # 天线发射功率 16 dBm
+        TX_Gain = kwargs['TX_Gain']                                    # 发射天线增益 2 dBi
+        RX_Gain = kwargs['RX_Gain']                                    # 接收天线增益 2 dBi
+        TX_heigh = kwargs['TX_heigh']                                  # 发射天线有效高度 m
+        RX_heigh = kwargs['RX_heigh']                                  # 接收天线有效高度 m
         
         '''
         瞬时多普勒频移需要的参数
@@ -71,13 +81,13 @@ class main_doppler():
         '''
         设备参数设置
         '''
-        fc = 5.9e9                                                     # 载波中心频率 Hz
+        fc = kwargs['fc']                                              # 载波中心频率 Hz
         c = 3e8                                                        # 光速 m/s
-        ATT_mark = 23                                                  # 衰减系数ATT为8
+        ATT_mark = kwargs['ATT_mark']                                  # 衰减系数ATT为8
         ATT = Att_mark(ATT_mark)
-        chirp_num = (1933+1933+1934)/3                                 # chirp数目3秒1933+1933+1934(可能会引起后面作图错误)
-        cable1 = 3                                                     # 线损3dB
-        cable2 = 3                                                     # 线损3dB
+        chirp_num = kwargs['chirp_num']                                # chirp数目3秒1933+1933+1934(可能会引起后面作图错误)
+        cable1 = 0                                                     # 线损3dB
+        cable2 = kwargs['cable'] - cable1                              # 线损3dB
         
         '''
         测试数据读取
@@ -98,13 +108,16 @@ class main_doppler():
             CIR_1[n] = signal_CIR[n][:]                                                                 # 原始 CIR 信号 cell
             CIR_1[n][:, 0] = CIR_1[n][:, 1] - np.random.rand(1, 1) / 1e4                                # 去掉起始点的突起 rand是为了防止出现多普勒频移处找点重合的问题
         
-        signal_CIR = []                                                                                 # 清除缓存数据
+        del signal_CIR[:]                                                                               # 清除缓存数据
+        del txt_info.signal_CIR[:]
+        
         T = rx_xls.T                                                                                    # 注意：若第一个文件是有效的那要把1改为其它对应时间
         d = GPS_2_distance(GPS_rx, GPS_tx)                                                              # d units: km
         Dis = d * 1000                                                                                  # Dis units: m
-        max_v = max_speed                                                                               # 最大相对速度用于取窗
+        max_v = max_speed.copy()                                                                        # 最大相对速度用于取窗
         win_wide = np.floor(window * (chirp_num * (c / fc)) / max_v)                                    # 窗宽 units: chirp
         after_window = signal_window(win_wide, data_pdp)
+        del data_pdp[:]
         after_window_cir = CIR_window(win_wide, CIR_1)
         distance = distance_match(after_window, Dis)
         time = time_match(after_window, T)
@@ -120,8 +133,11 @@ class main_doppler():
             TIME = np.concatenate((TIME, time[i + 1]), axis = 0)
             V_Rel = np.concatenate((V_Rel, V_rel[i + 1]), axis = 0)
         CIR_window_doppler = after_window_cir[0 : np.shape(TIME)[0]]
-        after_window_cir = []
-        CIR_1 = []
+        del after_window_cir[:]
+        del CIR_1[:]
+        del distance[:]
+        del time[:]
+        del V_rel[:]
         
         '''
         获取振幅分布数据
@@ -144,6 +160,10 @@ class main_doppler():
                 AIC_data_t = np.concatenate((AIC_data_t, np.fft.ifft(AIC_data_f, axis = 0)))
             AIC_com.append(AIC_data_t)
             AIC_DATA.append(np.abs(AIC_data_t))
+        del AIC_data_t
+        del AIC_com[:]
+        del AIC_data[:]
+        del Chirp_t
         
         '''
         等效窄带信号获取处理
@@ -165,6 +185,9 @@ class main_doppler():
             SM_time = np.concatenate((SM_time, time_sm[num]))
             SM_distance = np.concatenate((SM_distance, distance_sm[num]))
             
+        del distance_sm[:]
+        del time_sm[:]
+        
         Equ_Narr_band = CIR_window_doppler[0]
         for num in range(1, num_sm1 - 1):
             Equ_Narr_band = np.concatenate((Equ_Narr_band, CIR_window_doppler[num]), axis = 0)
@@ -199,6 +222,7 @@ class main_doppler():
             p_De.append(idx[1][0])
         p_Hz = np.array(p_Hz)
         p_De = np.array(p_De)
+        del fre_domain[:]
         
         Max_doppler = []
         for n in range(0, num_aa):
@@ -214,9 +238,13 @@ class main_doppler():
         CIR_D = CIR_window_doppler[d_begp : d_endp + 1]
         num_Da = len(CIR_D)
         
+        del CIR_window_doppler[:]
+        
         CIR_doppler = CIR_D[0]
         for n in range(1, num_Da):
             CIR_doppler = np.concatenate((CIR_doppler, CIR_D[n]))
+        
+        del CIR_D[:]
             
         # 具体秒数多普勒频移
         fre_in_domain = 10 * np.log10(ATT * np.power(np.abs(np.fft.fftshift(np.fft.fft(CIR_doppler, axis=0), axes=(0, ))), 2))
@@ -250,7 +278,7 @@ class main_doppler():
         '''
         #fig = plt.figure(figsize=(8, 6), dpi=100, tight_layout=True)
         # 自动控制排版
-        fig = plt.figure(tight_layout = True)
+        fig = plt.figure(1, tight_layout = True, clear=True)
         
         ax = fig.add_subplot(211)
         X, Y = np.meshgrid(TIME, np.arange(t_res, t_res * 2560 + t_res / 10e4, t_res))
@@ -275,20 +303,31 @@ class main_doppler():
         # 显示网格
         ax.grid(True)
         
-        plt.savefig('./results/Main_function_and_doppler/Main_function_and_doppler_fig1')
+        plt.savefig('./results/Main_function_and_doppler/Main_function_and_doppler_fig1.png')
+        plt.clf()
+        plt.cla()
+        plt.close(fig)
+        # 保存此图变量
+        np.savez('./plot_params/Main_function_and_doppler_fig1.npz', TIME=TIME, t_res=t_res, pdp_window=pdp_window, channel_gain=channel_gain)
         
         '''
         绘制保存fig11
         绘制3d图像, rstride=1, cstride=1相当耗时
         '''
-        fig = plt.figure(tight_layout = True)
+        fig = plt.figure(11, tight_layout = True, clear=True)
         ax = fig.add_subplot(111, projection = '3d')
         ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.jet, linewidth=0, antialiased=False)
         ax.view_init(None, 30)
         ax.set_xlabel('Time in s', fontproperties = 'Times New Roman', fontsize = 10)
         ax.set_zlabel('Delay in ns', fontproperties = 'Times New Roman', fontsize = 10)
         
-        plt.savefig('./results/Main_function_and_doppler/Main_function_and_doppler_fig11')
+        plt.savefig('./results/Main_function_and_doppler/Main_function_and_doppler_fig11.png')
+        plt.clf()
+        plt.cla()
+        plt.close(fig)
+        del X, Y, Z
+        # 保存此图变量
+        np.savez('./plot_params/Main_function_and_doppler_fig11.npz', TIME=TIME, t_res=t_res, pdp_window=pdp_window)
         
         '''
         绘制保存fig2
@@ -299,7 +338,7 @@ class main_doppler():
         X = np.arange(t_res, t_res * 2560 + t_res / 10e4, t_res)
         Y = 10 * np.log10(after_window[sec - 1][num_win - 1, :])
         
-        fig = plt.figure(tight_layout = True)
+        fig = plt.figure(2, tight_layout = True, clear=True)
         ax = fig.add_subplot(111)
         ax.plot(X, Y, 'b', linewidth = 2)
         ax.set_xlim(0, t_res * 2560)
@@ -309,6 +348,12 @@ class main_doppler():
         ax.grid(True)
         
         plt.savefig('./results/Main_function_and_doppler/Main_function_and_doppler_fig2')
+        plt.clf()
+        plt.cla()
+        plt.close(fig)
+        # 保存此图变量
+        np.savez('./plot_params/Main_function_and_doppler_fig2.npz', X=X, Y=Y, t_res=t_res)
+        del X, Y
         
         '''
         绘制保存fig3
@@ -316,11 +361,12 @@ class main_doppler():
         n = 35
         
         X = np.arange(t_res / 1000, t_res * 2560 / 1000 + t_res / 1000 / 10e4, t_res / 1000)
-        Y = Hz_x
+        Y = Hz_x.copy()
         X, Y = np.meshgrid(X, Y)
         Z = fre_nor_domain[n - 1]
+        del fre_nor_domain[:]
         
-        fig = plt.figure(tight_layout = True)
+        fig = plt.figure(3, tight_layout = True, clear=True)
         ax = fig.add_subplot(111)
         ax.contourf(X, Y, Z, cmap = cm.jet)
         ax.set_xlim(0, 5)
@@ -329,16 +375,22 @@ class main_doppler():
         ax.set_ylabel('Doppler Frequency in Hz', fontproperties = 'Times New Roman', fontsize = 10)
         
         plt.savefig('./results/Main_function_and_doppler/Main_function_and_doppler_fig3')
+        plt.clf()
+        plt.cla()
+        plt.close(fig)
+        # 保存此图变量
+        np.savez('./plot_params/Main_function_and_doppler_fig3.npz', X=X, Y=Y, Z=Z)
+        del X, Y, Z
         
         '''
         绘制保存fig4
         '''
         X = np.arange(t_res, t_res * 2560 + t_res / 10e4, t_res)
-        Y = Hz_in_x
+        Y = Hz_in_x.copy()
         X, Y = np.meshgrid(X, Y)
         Z = Fre_innor_domain[0 : np.shape(Hz_in_x)[0], :]
     
-        fig = plt.figure(tight_layout = True)
+        fig = plt.figure(4, tight_layout = True, clear=True)
         ax = fig.add_subplot(111)
         ax.contourf(X, Y, Z, cmap = cm.jet)
         ax.set_xlim(0, 2000)
@@ -347,14 +399,17 @@ class main_doppler():
         ax.set_ylabel('Doppler Frequency in Hz', fontproperties = 'Times New Roman', fontsize = 10)
     
         plt.savefig('./results/Main_function_and_doppler/Main_function_and_doppler_fig4')
+        plt.clf()
+        plt.cla()
+        plt.close(fig)
+        # 保存此图变量
+        np.savez('./plot_params/Main_function_and_doppler_fig4.npz', X=X, Y=Y, Z=Z)
+        del X, Y, Z
         
         '''
         绘制保存fig5
         '''
-        X = SM_time
-        Y = NB_signal
-    
-        fig = plt.figure(tight_layout = True)
+        fig = plt.figure(5, tight_layout = True, clear=True)
         ax = fig.add_subplot(111)
         ax.plot(SM_time, NB_signal, 'b-')
         ax.plot(SM_time, PL_no_SM, 'r-')
@@ -363,14 +418,19 @@ class main_doppler():
         ax.grid(True)
     
         plt.savefig('./results/Main_function_and_doppler/Main_function_and_doppler_fig5')
+        plt.clf()
+        plt.cla()
+        plt.close(fig)
+        # 保存此图变量
+        np.savez('./plot_params/Main_function_and_doppler_fig5.npz', SM_time=SM_time, NB_signal=NB_signal, PL_no_SM=PL_no_SM)
         
         '''
         绘制保存fig6
         '''
-        X = SM_time
-        Y = Small_scale_fading
+        X = SM_time.copy()
+        Y = Small_scale_fading.copy()
     
-        fig = plt.figure(tight_layout = True)
+        fig = plt.figure(6, tight_layout = True, clear=True)
         ax = fig.add_subplot(111)
         ax.plot(X, Y, 'b')
         ax.set_xlim(np.min(X), np.max(X))
@@ -380,14 +440,20 @@ class main_doppler():
         ax.grid(True)
     
         plt.savefig('./results/Main_function_and_doppler/Main_function_and_doppler_fig6')
+        plt.clf()
+        plt.cla()
+        plt.close(fig)
+        # 保存此图变量
+        np.savez('./plot_params/Main_function_and_doppler_fig6.npz', X=X, Y=Y)
+        del X, Y
         
         '''
         绘制保存fig8
         '''
-        X = TIME
-        Y = channel_gain
-    
-        fig = plt.figure(tight_layout = True)
+        X = TIME.copy()
+        Y = channel_gain.copy()
+        
+        fig = plt.figure(8, tight_layout = True, clear=True)
         ax = fig.add_subplot(111)
         ax.plot(X, Y, 'b')
         ax.set_xlim(np.min(X), np.max(X))
@@ -397,6 +463,14 @@ class main_doppler():
         ax.grid(True)
     
         plt.savefig('./results/Main_function_and_doppler/Main_function_and_doppler_fig8')
+        plt.clf()
+        plt.cla()
+        plt.close(fig)
+        # 保存此图变量
+        np.savez('./plot_params/Main_function_and_doppler_fig8.npz', X=X, Y=Y)
+        del X, Y
+        
+        plt.close('all')
         
         '''
         保存变量
@@ -438,6 +512,8 @@ class main_doppler():
                  TX_power = TX_power, TX_Gain = TX_Gain, RX_Gain = RX_Gain, TX_heigh = TX_heigh, RX_heigh = RX_heigh,
                  TIME = TIME, D_window = D_window, v_rx = v_rx, v_tx = v_tx, Hz_x = Hz_x)
         np.savez('./params/dop_data.npz', for_dop = np.array(for_dop).reshape((len(for_dop), for_dop[0].shape[0], for_dop[0].shape[1])))
+        
+        del after_window[:], for_dop[:], AIC_DATA[:], for_dop[:]
         
         
         
@@ -606,6 +682,28 @@ class main_doppler():
             print(LOS_delay.shape)
             print(LOS_delay[0:6])
             print(LOS_delay[-6:])
+            
+    def xls_folder_process(self, xls_folder):
+        # 遍历path目录选取所有.txt文件
+        xls_list = []
+        for dir_path, dir_names, file_names in os.walk(xls_folder):
+            for file_name in file_names:
+                if os.path.splitext(file_name)[-1] == '.xls':
+                    xls_list.append(os.path.join(dir_path, file_name))
+                    
+        print(xls_list)
+        # 提取txt文件名的前一部分，这里需要保证排序的数字的前一部分必须确定，且以'_'分割
+        file_header = '_'.join(os.path.splitext(xls_list[0])[0].split('_')[:-1])
+        # 提取xls文件名中排序的部分，并且拼接
+        rx_file = ''
+        tx_file = ''
+        xls_list = [os.path.splitext(file_name)[0].split('_')[-1] for file_name in xls_list]
+        for i in xls_list:
+            if i == 'rx':
+                rx_file = file_header + '_' + 'rx' + '.xls'
+            elif i == 'tx':
+                tx_file = file_header + '_' + 'tx' + '.xls'
+        return rx_file, tx_file
         
 
 if __name__ == '__main__':

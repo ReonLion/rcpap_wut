@@ -105,3 +105,4 @@ ENV/
 *.pyc
 /results/
 /params/
+/plot_params/
