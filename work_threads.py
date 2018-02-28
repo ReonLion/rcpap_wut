@@ -19,6 +19,7 @@ class main_doppler_thread(QThread):
         super(main_doppler_thread, self).__init__()
         self.working = True
         
+        self.t_start = kwargs['t_start']
         self.window = kwargs['window']
         self.TX_power = kwargs['TX_power']
         self.TX_Gain = kwargs['TX_Gain']
@@ -36,10 +37,14 @@ class main_doppler_thread(QThread):
         self.working = False
     
     def run(self):
-        main_doppler(window = self.window, TX_power = self.TX_power, TX_Gain = self.TX_Gain, 
-                     RX_Gain = self.RX_Gain,TX_heigh = self.TX_heigh, RX_heigh = self.RX_heigh, 
-                     fc = self.fc, ATT_mark = self.ATT_mark, cable = self.cable, chirp_num = self.chirp_num, 
-                     txt_folder = self.txt_folder, xls_folder = self.xls_folder)
+        try:
+            main_doppler(t_start = self.t_start, window = self.window, TX_power = self.TX_power, TX_Gain = self.TX_Gain, 
+                         RX_Gain = self.RX_Gain,TX_heigh = self.TX_heigh, RX_heigh = self.RX_heigh, 
+                         fc = self.fc, ATT_mark = self.ATT_mark, cable = self.cable, chirp_num = self.chirp_num, 
+                         txt_folder = self.txt_folder, xls_folder = self.xls_folder)
+        except:
+            self.sin_out.emit('Main Doppler Error')
+            return
         self.sin_out.emit('Main Doppler Done')
         return
         

@@ -74,7 +74,7 @@ class small_scale_fading():
         '''
         图形生成程序
         '''
-        T = T -71
+        T = T - np.min(T) + 1
         
         '''
         绘制保存fig1

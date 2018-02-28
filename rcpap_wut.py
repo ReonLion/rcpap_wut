@@ -1,12 +1,13 @@
 # coding=utf-8
 
 import os, datetime
+import csv
 import qdarkstyle
 from ui.rcpap_wut_ui import Ui_MainWindow
 from ui.dialogs import delay_domain_dialog, frequency_domain_dialog, power_domain_dialog
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QFileDialog
-from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QAbstractItemView, QHeaderView, QMessageBox
+from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QAbstractItemView, QHeaderView, QMessageBox, QLineEdit
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QIcon, QPixmap, QMovie
 
@@ -56,6 +57,12 @@ class main_form(QMainWindow, Ui_MainWindow):
         
         # 设置最近一次Main Doppler的时间
         self.set_latest_params_time()
+        
+        # 导入上一次输入的变量
+        self.params_csv_load()
+        
+        # logo显示
+        self.logo_label.setPixmap(QPixmap(os.path.join('.', 'icon', 'logo.png')).scaled(150, 150))
         
     def custom_ui(self):
         '''
@@ -141,6 +148,7 @@ class main_form(QMainWindow, Ui_MainWindow):
         参数从UI界面输入
         '''
         try:
+            t_start = eval(self.t_start_lineEdit.text())
             window = eval(self.window_lineEdit.text())
             TX_power = eval(self.tx_power_lineEdit.text())
             TX_Gain = eval(self.tx_gain_lineEdit.text())
@@ -154,6 +162,10 @@ class main_form(QMainWindow, Ui_MainWindow):
         except:
             QMessageBox.critical(self, 'Error', 'Params Input Error !')
             return
+        
+        # 保存这些输入变量的值
+        self.params_csv_save()
+        
         '''
         检测txt和excel目录是否有效
         '''
@@ -181,11 +193,10 @@ class main_form(QMainWindow, Ui_MainWindow):
         # main_doppler_tableWidget显示Results will be here
         self.tablewidget_clear('main_doppler_tableWidget')
         
-        
         '''
         main_doppler_thread线程开始
         '''
-        self.main_doppler_workthread = main_doppler_thread(window = window, TX_power = TX_power, 
+        self.main_doppler_workthread = main_doppler_thread(t_start = t_start, window = window, TX_power = TX_power, 
                                                            TX_Gain = TX_Gain, RX_Gain = RX_Gain,
                                                            TX_heigh = TX_heigh, RX_heigh = RX_heigh, 
                                                            fc = fc, ATT_mark = ATT_mark, cable = cable, 
@@ -195,7 +206,12 @@ class main_form(QMainWindow, Ui_MainWindow):
         self.main_doppler_workthread.sin_out.connect(self.main_doppler_done)
         return
     
-    def main_doppler_done(self):
+    def main_doppler_done(self, info):
+        if info == 'Main Doppler Error':
+            QMessageBox.critical(self, 'Error', 'Main Doppler Error !\n *Ensure that the .txt and .xls directory is correct !\n *.xlsx must be converted to .xls !\n *Ensure that T Start is correct !')
+            self.tablewidget_clear('main_doppler_tableWidget')
+            return
+        
         # toolBox切换到索引0
         self.toolBox.setCurrentIndex(0)
         # 获取文件夹下排序后的图片名路径
@@ -495,7 +511,7 @@ class main_form(QMainWindow, Ui_MainWindow):
         
         main_doppler_file = os.path.join('.', 'results', 'Main_function_and_doppler', 'Main_function_and_doppler_fig1.png')
         if os.path.isfile(main_doppler_file):
-            self.main_doppler_done()
+            self.main_doppler_done('Main Doppler Done')
         else:
             QMessageBox.critical(self, 'Error', 'The import failured !')
             return
@@ -526,7 +542,7 @@ class main_form(QMainWindow, Ui_MainWindow):
             if datetime.datetime.fromtimestamp(power_domain_file_mtime) > datetime.datetime.fromtimestamp(main_doppler_file_mtime):
                 self.power_domain_done()
                 
-        self.main_doppler_done()
+        self.main_doppler_done('Main Doppler Done')
         
         QMessageBox.information(self, '', 'The import successed !')
         return
@@ -539,7 +555,33 @@ class main_form(QMainWindow, Ui_MainWindow):
             time = datetime.datetime.fromtimestamp(timestamp)
             time = time.strftime('%Y-%m-%d %H:%M:%S')
             self.import_params_pushButton.setToolTip('Latest: ' + time)
+            
+    def params_csv_save(self):
+        with open(os.path.join('.', 'params', 'params.csv'), 'w') as csv_file:
+            csv_writer = csv.writer(csv_file)
+            csv_writer.writerow([self.t_start_lineEdit.objectName(), self.t_start_lineEdit.text()])
+            csv_writer.writerow([self.window_lineEdit.objectName(), self.window_lineEdit.text()])
+            csv_writer.writerow([self.tx_power_lineEdit.objectName(), self.tx_power_lineEdit.text()])
+            csv_writer.writerow([self.tx_gain_lineEdit.objectName(), self.tx_gain_lineEdit.text()])
+            csv_writer.writerow([self.rx_gain_lineEdit.objectName(), self.rx_gain_lineEdit.text()])
+            csv_writer.writerow([self.tx_heigh_lineEdit.objectName(), self.tx_heigh_lineEdit.text()])
+            csv_writer.writerow([self.rx_heigh_lineEdit.objectName(), self.rx_heigh_lineEdit.text()])
+            csv_writer.writerow([self.fc_lineEdit.objectName(), self.fc_lineEdit.text()])
+            csv_writer.writerow([self.att_mark_lineEdit.objectName(), self.att_mark_lineEdit.text()])
+            csv_writer.writerow([self.cable_lineEdit.objectName(), self.cable_lineEdit.text()])
+            csv_writer.writerow([self.chirp_num_lineEdit.objectName(), self.chirp_num_lineEdit.text()])
+            
+    def params_csv_load(self):
+        if not os.path.exists(os.path.join('.', 'params', 'params.csv')):
+            return
         
+        try:
+            with open(os.path.join('.', 'params', 'params.csv'), 'r') as csv_file:
+                csv_reader = csv.reader(csv_file)
+                for csv_line in csv_reader:
+                    self.findChild((QLineEdit, ), csv_line[0]).setText(csv_line[1])
+        except:
+            return
         
 if __name__ == '__main__':
     # 多进程打包为exe需要

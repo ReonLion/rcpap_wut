@@ -24,18 +24,18 @@ class main_doppler():
         '''
         设置Debug模式
         '''
-        debug_mode = False
-        
-        '''
-        设置t_start和t_stop
-        '''
-        t_start = 64                                                   # 读取excel的开始时间，第几行，包括这一行
-        t_stop = 69                                                    # 读取excel的结束时间，第几行，包括这一行
+        debug_mode = True
         
         '''
         读取txt, xls的信息
         '''
         txt_info = txt_read(kwargs['txt_folder'])
+        
+        '''
+        设置t_start和t_stop
+        '''
+        t_start = kwargs['t_start']                                    # 读取excel的开始时间，第几行，包括这一行
+        t_stop = t_start + txt_info.txt_num - 1                        # 读取excel的结束时间，第几行，包括这一行
         
         '''
         从UI选择的文件夹里选择xls文件
@@ -55,10 +55,48 @@ class main_doppler():
         rel_speed = np.maximum(v_tx, v_rx)
         
         '''
+        -------------------------------------------------------------------------------------
+        对数据进行裁剪
+        -------------------------------------------------------------------------------------
+        '''
+        d = GPS_2_distance(GPS_rx, GPS_tx)
+        Dis = d * 1000
+        t_los_min = np.min(Dis, axis=0) / 3e8
+        num_sample = np.ceil(t_los_min / 10e-9)
+        num_cell_row = len(signal_CIR)
+        
+        for n in range(0, num_cell_row):
+            signal_CIR[n][:, 0] = signal_CIR[n][:, 1] - np.random.rand(1, 1) / 1e4
+        
+        index_max = []
+        value_max = []
+        for n in range(0, num_cell_row):
+            cache = np.abs(signal_CIR[n])
+            value_max.append(np.max(np.max(cache)))
+            index_max.append((np.where(cache == value_max[n]))[-1][0] + 1)
+        value_max = np.array(value_max).astype('int64')
+        index_max = np.array(index_max).astype('int64')
+        
+        value = np.max(value_max, axis=0)
+        index = np.where(value_max == value)[0][0] + 1
+        index_cut = index_max[index - 1]
+        cutting_point = int(index_cut - num_sample - 3)
+        
+        for i in range(0, num_cell_row):
+            num_row = np.shape(signal_CIR[i])[0]
+            for j in range(0, num_row):
+                signal_CIR[i][j, :] = np.concatenate((signal_CIR[i][j, (cutting_point + 1 - 1) : int(np.shape(
+                    signal_CIR[i])[-1])], signal_CIR[i][j, 0:cutting_point]))
+        
+        '''
+        -------------------------------------------------------------------------------------
+        '''
+        
+        '''
         测试参数设置
         '''
         beg_p = 1                                                      # 数据起始点设置，从第二个chirp开始(由于第一个chirp不对所有的RSL数据都比RX位置数据多了1, 但此处也要注意)2对应了GPS坐标1
-        end_p = 6                                                      # 数据终止点设置，32对应了GPS坐标31
+        end_p = txt_info.txt_num                                       # 数据终止点设置，32对应了GPS坐标31
         window = kwargs['window']                                      # 窗设置，例如此处设为 20 lambda
         beg_t_mark = 0                                                 # 起始点时间序号，例如此数据共50s，因此，此时值为 0
         t_res = 10                                                     # unit:ns,esolution
@@ -271,7 +309,7 @@ class main_doppler():
         '''
         图形生成程序
         '''
-        TIME = TIME - 70
+        TIME = TIME - np.min(TIME) + 1
         
         '''
         绘制保存fig1
@@ -533,41 +571,12 @@ class main_doppler():
             print(rel_speed)
             print('ATT')
             print(ATT)
-            print('data_pdp')
-            for data in data_pdp:
-                print(data.shape)
-                print(data[0][0:6])
-            print('CIR_1')
-            for data in CIR_1:
-                print(data.shape)
-                print(data[0][0:6])
             print('T')
             print(T)
             print('d')
             print(d)
             print('win_wide')
             print(win_wide)
-            print('after_window')
-            for after_window_i in after_window:
-                print(after_window_i.shape)
-                print(after_window_i[0][0:6])
-            print('after_window_cir')
-            print(len(after_window_cir))
-            for after_window_cir_i in after_window_cir:
-                print(after_window_cir_i.shape)
-                print(after_window_cir_i[0][0:6])
-            print('distance')
-            for distance_i in distance:
-                print(distance_i.shape)
-                print(distance_i[0:6])
-            print('time')
-            for time_i in time:
-                print(time_i.shape)
-                print(time_i[0:6])
-            print('V_rel')
-            for V_rel_i in V_rel:
-                print(V_rel_i.shape)
-                print(V_rel_i[0:6])
             print('pdp_window')
             print(pdp_window.shape)
             print(pdp_window[-1][0:6])
@@ -580,33 +589,9 @@ class main_doppler():
             print('V_Rel')
             print(V_Rel.shape)
             print(V_Rel[20:26])
-            print('CIR_window_doppler')
-            print(len(CIR_window_doppler))
-            for CIR_window_doppler_i in CIR_window_doppler:
-                print(CIR_window_doppler_i.shape)
-                print(CIR_window_doppler_i[0][0:6])
-            print('Chirp_t')
-            print(Chirp_t.shape)
-            print(Chirp_t[0:6])
             print('Chirp_f')
             print(Chirp_f.shape)
             print(Chirp_f[0:6])
-            print('AIC_com')
-            print(len(AIC_com))
-            print(AIC_com[0][0:6])
-            print(AIC_com[-1][0:6])
-            print('AIC_DATA')
-            print((len(AIC_DATA)))
-            print(AIC_DATA[0][0:6])
-            print(AIC_DATA[-1][0:6])
-            print('distance_sm')
-            print(len(distance_sm))
-            print(distance_sm[0][0:6])
-            print(distance_sm[-1][0:6])
-            print('time_sm')
-            print(len(time_sm))
-            print(time_sm[0][0:6])
-            print(time_sm[-1][0:6])
             print('PL_no_sm')
             print(PL_no_sm.shape)
             print(PL_no_sm[0:6])
@@ -622,21 +607,6 @@ class main_doppler():
             print(Small_scale_fading.shape)
             print(Small_scale_fading[0:6])
             print(Small_scale_fading[-6:])
-            print('fre_domain')
-            print(len(fre_domain))
-            print(fre_domain[0].shape)
-            print(fre_domain[0][0, 0:6])
-            print(fre_domain[-1][0, 0:6])
-            print('for_dop')
-            print(len(for_dop))
-            print(for_dop[0].shape)
-            print(for_dop[0][0, 0:6])
-            print(for_dop[-1][0, 0:6])
-            print('fre_nor_domain')
-            print(len(fre_nor_domain))
-            print(fre_nor_domain[0].shape)
-            print(fre_nor_domain[0][0, 0:6])
-            print(fre_nor_domain[-1][0, 0:6])
             print('p_Hz')
             print(p_Hz.shape)
             print(p_Hz)
@@ -646,10 +616,6 @@ class main_doppler():
             print('Max_doppler')
             print(Max_doppler.shape)
             print(Max_doppler)
-            print('CIR_D')
-            print(len(CIR_D))
-            print(CIR_D[0][0, 0:6])
-            print(CIR_D[-1][0, 0:6])
             print('CIR_doppler')
             print(CIR_doppler.shape)
             print(CIR_doppler[0, 0:6])
@@ -682,6 +648,12 @@ class main_doppler():
             print(LOS_delay.shape)
             print(LOS_delay[0:6])
             print(LOS_delay[-6:])
+            print('value_max')
+            print(value_max)
+            print('index_max')
+            print(index_max)
+            print('index_cut')
+            print(index_cut)
             
     def xls_folder_process(self, xls_folder):
         # 遍历path目录选取所有.txt文件
@@ -691,7 +663,6 @@ class main_doppler():
                 if os.path.splitext(file_name)[-1] == '.xls':
                     xls_list.append(os.path.join(dir_path, file_name))
                     
-        print(xls_list)
         # 提取txt文件名的前一部分，这里需要保证排序的数字的前一部分必须确定，且以'_'分割
         file_header = '_'.join(os.path.splitext(xls_list[0])[0].split('_')[:-1])
         # 提取xls文件名中排序的部分，并且拼接
@@ -699,10 +670,12 @@ class main_doppler():
         tx_file = ''
         xls_list = [os.path.splitext(file_name)[0].split('_')[-1] for file_name in xls_list]
         for i in xls_list:
-            if i == 'rx':
-                rx_file = file_header + '_' + 'rx' + '.xls'
-            elif i == 'tx':
-                tx_file = file_header + '_' + 'tx' + '.xls'
+            if i == 'rx' or i == 'RX' or i == 'Rx':
+                rx_file = file_header + '_' + i + '.xls'
+            elif i == 'tx' or i == 'TX' or i == 'Tx':
+                tx_file = file_header + '_' + i + '.xls'
+        print(rx_file)
+        print(tx_file)
         return rx_file, tx_file
         
 

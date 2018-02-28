@@ -35,7 +35,7 @@ class AIC_Amp_determination():
         h_2 = ssf_paras['RX_heigh'] / 1000                                  # 接收天线有效高度 km
         SM_time = ssf_paras['SM_time']
         SM_distance = ssf_paras['SM_distance']
-        TIME = ssf_paras['TIME'] - 1
+        TIME = ssf_paras['TIME']
         data_x = Amp_DATA['AIC_DATA']
         
         '''

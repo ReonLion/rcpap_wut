@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1160</width>
-    <height>660</height>
+    <height>690</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,8 +20,13 @@
       <x>10</x>
       <y>20</y>
       <width>221</width>
-      <height>21</height>
+      <height>25</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>微软雅黑</family>
+     </font>
     </property>
     <property name="text">
      <string/>
@@ -36,8 +41,13 @@
       <x>250</x>
       <y>20</y>
       <width>31</width>
-      <height>21</height>
+      <height>25</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>微软雅黑</family>
+     </font>
     </property>
     <property name="text">
      <string>...</string>
@@ -47,19 +57,32 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>90</y>
+      <y>80</y>
       <width>271</width>
-      <height>341</height>
+      <height>381</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>微软雅黑</family>
+     </font>
     </property>
     <property name="title">
      <string>Parameters</string>
     </property>
     <layout class="QGridLayout" name="gridLayout">
+     <property name="bottomMargin">
+      <number>9</number>
+     </property>
      <item row="0" column="0">
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="label_5">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
        <property name="text">
-        <string>Window:</string>
+        <string>Start Num:</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -67,14 +90,51 @@
       </widget>
      </item>
      <item row="0" column="1">
+      <widget class="QLineEdit" name="t_start_lineEdit">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
+       <property name="text">
+        <string>1</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
+       <property name="text">
+        <string>Win Size:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
       <widget class="QLineEdit" name="window_lineEdit">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
        <property name="text">
         <string>10</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
+     <item row="2" column="0">
       <widget class="QLabel" name="label_2">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
        <property name="text">
         <string>Tx Power:</string>
        </property>
@@ -83,15 +143,25 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
+     <item row="2" column="1">
       <widget class="QLineEdit" name="tx_power_lineEdit">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
        <property name="text">
         <string>16</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
+     <item row="3" column="0">
       <widget class="QLabel" name="label_3">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
        <property name="text">
         <string>Tx Gain:</string>
        </property>
@@ -100,15 +170,25 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
+     <item row="3" column="1">
       <widget class="QLineEdit" name="tx_gain_lineEdit">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
        <property name="text">
         <string>2</string>
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
+     <item row="4" column="0">
       <widget class="QLabel" name="label_4">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
        <property name="text">
         <string>Rx Gain:</string>
        </property>
@@ -117,15 +197,25 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="1">
+     <item row="4" column="1">
       <widget class="QLineEdit" name="rx_gain_lineEdit">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
        <property name="text">
         <string>10</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
+     <item row="5" column="0">
       <widget class="QLabel" name="label_9">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
        <property name="text">
         <string>Tx Heigh:</string>
        </property>
@@ -134,15 +224,25 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
+     <item row="5" column="1">
       <widget class="QLineEdit" name="tx_heigh_lineEdit">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
        <property name="text">
         <string>1.57</string>
        </property>
       </widget>
      </item>
-     <item row="5" column="0">
+     <item row="6" column="0">
       <widget class="QLabel" name="label_10">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
        <property name="text">
         <string>Rx Heigh:</string>
        </property>
@@ -151,34 +251,27 @@
        </property>
       </widget>
      </item>
-     <item row="5" column="1">
+     <item row="6" column="1">
       <widget class="QLineEdit" name="rx_heigh_lineEdit">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
        <property name="text">
         <string>1.78</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="0">
-      <widget class="QLabel" name="label_11">
-       <property name="text">
-        <string>fc:</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="1">
-      <widget class="QLineEdit" name="fc_lineEdit">
-       <property name="text">
-        <string>5.9e9</string>
-       </property>
-      </widget>
-     </item>
      <item row="7" column="0">
-      <widget class="QLabel" name="label_13">
+      <widget class="QLabel" name="label_11">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
        <property name="text">
-        <string>ATT Mark:</string>
+        <string>Carrier f:</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -186,14 +279,51 @@
       </widget>
      </item>
      <item row="7" column="1">
+      <widget class="QLineEdit" name="fc_lineEdit">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
+       <property name="text">
+        <string>5.9e9</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="0">
+      <widget class="QLabel" name="label_13">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
+       <property name="text">
+        <string>Att Mark:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="1">
       <widget class="QLineEdit" name="att_mark_lineEdit">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
        <property name="text">
         <string>23</string>
        </property>
       </widget>
      </item>
-     <item row="8" column="0">
+     <item row="9" column="0">
       <widget class="QLabel" name="label_12">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
        <property name="text">
         <string>Cable:</string>
        </property>
@@ -202,15 +332,25 @@
        </property>
       </widget>
      </item>
-     <item row="8" column="1">
+     <item row="9" column="1">
       <widget class="QLineEdit" name="cable_lineEdit">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
        <property name="text">
         <string>6</string>
        </property>
       </widget>
      </item>
-     <item row="9" column="0">
+     <item row="10" column="0">
       <widget class="QLabel" name="label_14">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
        <property name="text">
         <string>Chirp Num:</string>
        </property>
@@ -219,15 +359,25 @@
        </property>
       </widget>
      </item>
-     <item row="9" column="1">
+     <item row="10" column="1">
       <widget class="QLineEdit" name="chirp_num_lineEdit">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
        <property name="text">
         <string>(1933+1933+1934)/3</string>
        </property>
       </widget>
      </item>
-     <item row="10" column="1">
+     <item row="11" column="1">
       <widget class="QPushButton" name="confirm_pushButton">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
        <property name="text">
         <string>Confirm</string>
        </property>
@@ -238,11 +388,16 @@
    <widget class="QGroupBox" name="groupBox_3">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>440</y>
+      <x>290</x>
+      <y>540</y>
       <width>271</width>
-      <height>91</height>
+      <height>101</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>微软雅黑</family>
+     </font>
     </property>
     <property name="title">
      <string>Functions</string>
@@ -250,6 +405,11 @@
     <layout class="QGridLayout" name="gridLayout_3">
      <item row="1" column="0">
       <widget class="QPushButton" name="power_pushButton">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
        <property name="text">
         <string>Power Domain</string>
        </property>
@@ -257,6 +417,13 @@
      </item>
      <item row="0" column="0">
       <widget class="QPushButton" name="delay_pushButton">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
        <property name="text">
         <string>Delay Domain</string>
        </property>
@@ -264,6 +431,11 @@
      </item>
      <item row="0" column="1">
       <widget class="QPushButton" name="frequency_pushButton">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
        <property name="text">
         <string>Frequency Domain</string>
        </property>
@@ -271,6 +443,11 @@
      </item>
      <item row="1" column="1">
       <widget class="QPushButton" name="angel_pushButton">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
        <property name="text">
         <string>Angel Domain</string>
        </property>
@@ -281,11 +458,16 @@
    <widget class="QGroupBox" name="groupBox_5">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>530</y>
+      <x>690</x>
+      <y>540</y>
       <width>271</width>
-      <height>84</height>
+      <height>101</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>微软雅黑</family>
+     </font>
     </property>
     <property name="title">
      <string>Other Functions</string>
@@ -295,6 +477,7 @@
       <widget class="QPushButton" name="import_params_pushButton">
        <property name="font">
         <font>
+         <family>微软雅黑</family>
          <pointsize>8</pointsize>
         </font>
        </property>
@@ -305,6 +488,11 @@
      </item>
      <item row="0" column="1">
       <widget class="QPushButton" name="B_pushButton">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
        <property name="text">
         <string>B</string>
        </property>
@@ -312,6 +500,11 @@
      </item>
      <item row="1" column="0">
       <widget class="QPushButton" name="C_pushButton">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
        <property name="text">
         <string>C</string>
        </property>
@@ -319,6 +512,11 @@
      </item>
      <item row="1" column="1">
       <widget class="QPushButton" name="D_pushButton">
+       <property name="font">
+        <font>
+         <family>微软雅黑</family>
+        </font>
+       </property>
        <property name="text">
         <string>D</string>
        </property>
@@ -332,8 +530,13 @@
       <x>10</x>
       <y>50</y>
       <width>221</width>
-      <height>21</height>
+      <height>25</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>微软雅黑</family>
+     </font>
     </property>
     <property name="text">
      <string/>
@@ -348,8 +551,13 @@
       <x>250</x>
       <y>50</y>
       <width>31</width>
-      <height>21</height>
+      <height>25</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>微软雅黑</family>
+     </font>
     </property>
     <property name="text">
      <string>...</string>
@@ -361,8 +569,13 @@
       <x>970</x>
       <y>18</y>
       <width>171</width>
-      <height>581</height>
+      <height>621</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>微软雅黑</family>
+     </font>
     </property>
     <property name="currentIndex">
      <number>0</number>
@@ -373,7 +586,7 @@
        <x>0</x>
        <y>0</y>
        <width>171</width>
-       <height>477</height>
+       <height>497</height>
       </rect>
      </property>
      <attribute name="label">
@@ -382,6 +595,11 @@
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <widget class="QTableWidget" name="main_doppler_tableWidget">
+        <property name="font">
+         <font>
+          <family>微软雅黑</family>
+         </font>
+        </property>
         <property name="editTriggers">
          <set>QAbstractItemView::NoEditTriggers</set>
         </property>
@@ -395,7 +613,7 @@
        <x>0</x>
        <y>0</y>
        <width>171</width>
-       <height>477</height>
+       <height>497</height>
       </rect>
      </property>
      <attribute name="label">
@@ -417,7 +635,7 @@
        <x>0</x>
        <y>0</y>
        <width>171</width>
-       <height>477</height>
+       <height>497</height>
       </rect>
      </property>
      <attribute name="label">
@@ -439,7 +657,7 @@
        <x>0</x>
        <y>0</y>
        <width>171</width>
-       <height>477</height>
+       <height>497</height>
       </rect>
      </property>
      <attribute name="label">
@@ -465,6 +683,11 @@
       <height>530</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>微软雅黑</family>
+     </font>
+    </property>
     <property name="title">
      <string>View</string>
     </property>
@@ -476,6 +699,11 @@
        <width>640</width>
        <height>480</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>微软雅黑</family>
+      </font>
      </property>
      <property name="text">
       <string/>
@@ -493,10 +721,28 @@
        <height>23</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <family>微软雅黑</family>
+      </font>
+     </property>
      <property name="text">
       <string>Details...</string>
      </property>
     </widget>
+   </widget>
+   <widget class="QLabel" name="logo_label">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>480</y>
+      <width>150</width>
+      <height>150</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

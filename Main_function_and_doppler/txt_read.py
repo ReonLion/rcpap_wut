@@ -9,6 +9,7 @@ import timeit
 class txt_read():
     # signal_CIR
     signal_CIR = []                                                       # signal_CIR初始化，其长度是.txt文件数量
+    txt_num = 0
     
     def __init__(self, path):
         # 遍历path目录选取所有.txt文件
@@ -26,6 +27,7 @@ class txt_read():
         # 对文件名进行拼接
         file_list = [file_header + '_' + file_name + '.txt' for file_name in file_list]
         print(file_list)
+        self.txt_num = len(file_list)
         
         # 对每个.txt文件调用read方法处理
         for file in file_list:
