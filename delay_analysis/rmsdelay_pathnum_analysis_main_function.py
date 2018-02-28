@@ -46,8 +46,6 @@ class rmsdelay_pathnum_analysis():
         Thre = []
         num_a = delay_data.shape[0]
         for n in range(1, num_a - 1):
-            num_thre = delay_data.shape[1]
-            num_thre_b = delay_data.shape[2]
             pdp_window = np.vstack((pdp_window, delay_data[n]))
         pdp_window[:, 0] = pdp_window[:, 1]
         lim_a = pdp_window.shape[0]
