@@ -47,6 +47,14 @@ class main_doppler_thread(QThread):
             return
         self.sin_out.emit('Main Doppler Done')
         return
+    
+    #def run(self):
+        #main_doppler(t_start = self.t_start, window = self.window, TX_power = self.TX_power, TX_Gain = self.TX_Gain, 
+                     #RX_Gain = self.RX_Gain,TX_heigh = self.TX_heigh, RX_heigh = self.RX_heigh, 
+                     #fc = self.fc, ATT_mark = self.ATT_mark, cable = self.cable, chirp_num = self.chirp_num, 
+                     #txt_folder = self.txt_folder, xls_folder = self.xls_folder)
+        #self.sin_out.emit('Main Doppler Done')
+        #return
         
 class delay_domain_thread(QThread):
     '''
