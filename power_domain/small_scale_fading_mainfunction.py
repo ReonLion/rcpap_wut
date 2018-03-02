@@ -11,7 +11,7 @@ class small_scale_fading():
         '''
         设置debug模式
         '''
-        debug_mode = True
+        debug_mode = False
         
         ssf_paras = np.load('./params/ssf_paras.npz')
         ssf_data = np.load('./params/ssf_data.npz')

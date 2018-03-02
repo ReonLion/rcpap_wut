@@ -10,7 +10,7 @@ class AIC_Amp_determination():
         '''
         设置Debug模式
         '''
-        debug_mode = True
+        debug_mode = False
         
         ssf_paras = np.load('./params/ssf_paras.npz')
         Amp_DATA = np.load('./params/Amp_DATA.npz')

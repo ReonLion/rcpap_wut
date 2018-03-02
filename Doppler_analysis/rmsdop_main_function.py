@@ -11,7 +11,7 @@ class rmsdop():
         '''
         设置debug模式
         '''
-        debug_mode = True
+        debug_mode = False
         
         dop_paras = np.load('./params/dop_paras.npz')
         dop_data_cache = np.load('./params/dop_data.npz')

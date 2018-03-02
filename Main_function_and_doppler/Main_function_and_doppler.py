@@ -24,7 +24,7 @@ class main_doppler():
         '''
         设置Debug模式
         '''
-        debug_mode = True
+        debug_mode = False
         
         '''
         读取txt, xls的信息

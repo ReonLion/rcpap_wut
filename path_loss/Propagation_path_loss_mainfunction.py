@@ -13,7 +13,7 @@ class Propagation_path_loss():
         '''
         设置Debug模式
         '''
-        debug_mode = True
+        debug_mode = False
         
         PL_paras = np.load('./params/PL_paras.npz')
         PL_data = np.load('./params/PL_data.npz')
@@ -538,9 +538,9 @@ class Propagation_path_loss():
         rmse8 = np.sqrt((np.sum(d8 ** 2, axis = 0)) / n)
         RMSE = np.array([rmse1, rmse2, rmse3, rmse4, rmse5, rmse6, rmse7, rmse8]).astype('complex64')
         
-        maxrxy_0 = np.min(RMSE)
-        column0 = np.where(RMSE == maxrxy_0)[0][0] + 1
-        print('最小的RMSE值：%s' % str(column0))
+        #maxrxy_0 = np.min(RMSE)
+        #column0 = np.where(RMSE == maxrxy_0)[0][0] + 1
+        #print('最小的RMSE值：%s' % str(column0))
         
         '''
         Grey System Thoery & MAPE
@@ -609,9 +609,9 @@ class Propagation_path_loss():
         mape8 = np.sum(np.abs(w8 - w0) / w0) / n
         mape = np.array([1-mape1, 1-mape2, 1-mape3, 1-mape4, 1-mape5, 1-mape6, 1-mape7, 1-mape8])
         GRG_MAPE = 0.1 * grg + 0.9 *np.abs(mape)
-        maxrxy_1 = np.max(GRG_MAPE, axis = 0)
-        column1 = np.where(GRG_MAPE == maxrxy_1)[0][0] + 1
-        print('最大的GRG-MAPE值：%s' % str(column1))
+        #maxrxy_1 = np.max(GRG_MAPE, axis = 0)
+        #column1 = np.where(GRG_MAPE == maxrxy_1)[0][0] + 1
+        #print('最大的GRG-MAPE值：%s' % str(column1))
         
         '''
         PEARSON
@@ -626,9 +626,9 @@ class Propagation_path_loss():
         pwar8 = pearson_fun(w0, w8, n)
         pearson = np.array([pear1, pear2, pear3, pear4, pear5, pear6, pear7, pwar8])
         PEARSON_MAPE = 0.1 * pearson + 0.9 * mape
-        maxrxy_2 = np.max(PEARSON_MAPE, axis = 0)
-        column2 = np.where(PEARSON_MAPE == maxrxy_2)[0][0] + 1
-        print('最大的PEARSON_MAPE值：%s' % str(column2))
+        #maxrxy_2 = np.max(PEARSON_MAPE, axis = 0)
+        #column2 = np.where(PEARSON_MAPE == maxrxy_2)[0][0] + 1
+        #print('最大的PEARSON_MAPE值：%s' % str(column2))
         
         '''
         图形生成程序
@@ -779,13 +779,9 @@ class Propagation_path_loss():
             print('mape')
             print(mape.shape)
             print(mape)
-            print('maxrxy_1, column1')
-            print(maxrxy_1, column1)
             print('PEARSON_MAPE')
             print(PEARSON_MAPE.shape)
             print(PEARSON_MAPE)
-            print('maxrxy_2, column2')
-            print(maxrxy_2, column2)
             
             
     

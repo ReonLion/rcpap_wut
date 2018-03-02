@@ -11,7 +11,7 @@ class rmsdelay_pathnum_analysis():
         '''
         设置debug模式
         '''
-        debug_mode = True
+        debug_mode = False
     
         delay_paras = np.load('./params/delay_paras.npz')
         delay_data_cache = np.load('./params/delay_data.npz')
